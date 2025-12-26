@@ -1,5 +1,6 @@
+import Foundation
 struct Librarian {
-    let librarianId: Int
+    let librarianId: UUID
     var name: String
     var email: String
     var password: String

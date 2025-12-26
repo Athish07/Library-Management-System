@@ -1,12 +1,10 @@
 import Foundation
-
 struct BorrowRequest {
-    let requestId: Int
-    let userId: Int
-    let bookId: Int
+    let requestId: UUID
+    let userId: UUID
+    let bookId: UUID
     let requestDate: Date
     var status: RequestStatus
     
 }
-
 

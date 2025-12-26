@@ -1,9 +1,8 @@
 import Foundation
-
 struct IssuedBook {
-    let issueId: Int
-    let bookId: Int
-    let userId: Int
+    let issueId: UUID
+    let bookId: UUID
+    let userId: UUID
     let issueDate: Date
     let dueDate: Date
     var returnDate: Date? = nil

@@ -2,14 +2,16 @@ import CryptoKit
 import Foundation
 
 class AuthenticationManager: AuthenticationService {
-
+    
     private let userRepository: UserRepository
+    private let librarianRepository: LibrarianRepository
 
-    init(userRepository: UserRepository) {
+    init(userRepository: UserRepository, librarianRepository: LibrarianRepository) {
         self.userRepository = userRepository
+        self.librarianRepository = librarianRepository
     }
 
-    func login(email: String, password: String) throws -> UUID? {
+    func loginUser(email: String, password: String) throws -> UUID  {
 
         guard let user = userRepository.findByEmail(email) else {
             throw AuthenticationError.userNotFound
@@ -50,8 +52,26 @@ class AuthenticationManager: AuthenticationService {
         )
 
         userRepository.save(user)
-
+        
     }
+    
+    func loginLibrarian(_ email: String, _ password: String) throws -> UUID {
+       
+        let librarian = librarianRepository.getLibrarian()
+        
+        guard librarian.email == email else {
+            throw AuthenticationError.userNotFound
+        }
+        
+        let hashedPassword = hash(password)
+        
+        guard librarian.password == hashedPassword else {
+            throw AuthenticationError.invalidPassword
+        }
+        
+        return librarian.librarianId
+    }
+    
     private func hash(_ password: String) -> String {
         let data = Data(password.utf8)
         let digest = SHA256.hash(data: data)

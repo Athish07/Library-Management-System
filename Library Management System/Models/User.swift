@@ -1,4 +1,5 @@
 import Foundation
+
 struct User {
     let userId: UUID
     var userName: String

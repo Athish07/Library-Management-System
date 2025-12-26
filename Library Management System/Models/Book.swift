@@ -1,4 +1,5 @@
 import Foundation
+
 struct Book {
     let bookId: UUID
     var title: String
@@ -6,5 +7,6 @@ struct Book {
     var category: BookCategory
     var totalCopies: Int
     var availableCopies: Int
+    
 }
 

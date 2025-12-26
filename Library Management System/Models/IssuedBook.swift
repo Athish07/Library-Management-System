@@ -1,4 +1,5 @@
 import Foundation
+
 struct IssuedBook {
     let issueId: UUID
     let bookId: UUID
@@ -8,4 +9,3 @@ struct IssuedBook {
     var returnDate: Date? = nil
     var fineAmount: Double = 0.0
 }
-

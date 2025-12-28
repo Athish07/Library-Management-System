@@ -1,17 +1,15 @@
 import CryptoKit
 import Foundation
 
-class AuthenticationManager: AuthenticationService {
-    
-    private let userRepository: UserRepository
-    private let librarianRepository: LibrarianRepository
+final class AuthenticationManager: AuthenticationService {
 
-    init(userRepository: UserRepository, librarianRepository: LibrarianRepository) {
+    private let userRepository: UserRepository
+
+    init(userRepository: UserRepository) {
         self.userRepository = userRepository
-        self.librarianRepository = librarianRepository
     }
 
-    func loginUser(email: String, password: String) throws -> UUID  {
+    func login(email: String, password: String) throws -> User {
 
         guard let user = userRepository.findByEmail(email) else {
             throw AuthenticationError.userNotFound
@@ -23,16 +21,16 @@ class AuthenticationManager: AuthenticationService {
             throw AuthenticationError.invalidPassword
         }
 
-        return user.userId
-
+        return user
     }
 
-    func registerUser(
-        userName: String,
+    func register(
+        name: String,
         email: String,
         password: String,
         phoneNumber: String,
-        address: String
+        address: String,
+        role: UserRole
     ) throws {
 
         if userRepository.findByEmail(email) != nil {
@@ -40,41 +38,23 @@ class AuthenticationManager: AuthenticationService {
         }
 
         let hashedPassword = hash(password)
-        let userId = UUID()
 
         let user = User(
-            userId: userId,
-            userName: userName,
+            name: name,
             email: email,
             password: hashedPassword,
             phoneNumber: phoneNumber,
-            address: address
+            address: address,
+            role: role
         )
 
         userRepository.save(user)
-        
     }
-    
-    func loginLibrarian(_ email: String, _ password: String) throws -> UUID {
-       
-        let librarian = librarianRepository.getLibrarian()
-        
-        guard librarian.email == email else {
-            throw AuthenticationError.userNotFound
-        }
-        
-        let hashedPassword = hash(password)
-        
-        guard librarian.password == hashedPassword else {
-            throw AuthenticationError.invalidPassword
-        }
-        
-        return librarian.librarianId
-    }
-    
+
     private func hash(_ password: String) -> String {
         let data = Data(password.utf8)
         let digest = SHA256.hash(data: data)
         return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
+

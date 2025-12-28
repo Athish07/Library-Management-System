@@ -1,8 +1,5 @@
-enum UserRole: String, CaseIterable, MenuItem {
+enum UserRole: String, CaseIterable {
     case user = "User"
     case librarian = "Librarian"
     
-    var displayTitle: String {
-        rawValue
-    }
 }

@@ -13,7 +13,11 @@ final class InMemoryUserRepository: UserRepository {
     }
     
     func findByEmail(_ email: String) -> User? {
-        users.values.first{$0.email == email}
+        users.values.first { $0.email == email }
     }
     
+    func findAll() -> [User] {
+        Array(users.values)
+    }
 }
+

@@ -1,13 +1,12 @@
-import Foundation
-
 protocol AuthenticationService {
-    func loginUser(email: String, password: String) throws -> UUID
-    func registerUser(
-        userName: String,
+    func login(email: String, password: String) throws -> User
+    func register(
+        name: String,
         email: String,
         password: String,
         phoneNumber: String,
-        address: String
+        address: String,
+        role: UserRole
     ) throws
-    func loginLibrarian(_ email: String, _ password: String) throws -> UUID
 }
+

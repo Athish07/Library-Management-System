@@ -8,5 +8,6 @@ protocol AuthenticationService {
         address: String,
         role: UserRole
     ) throws
+    func seedDemoDetails(userRepository: any UserRepository)
 }
 

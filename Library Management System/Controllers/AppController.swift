@@ -1,11 +1,13 @@
 import Foundation
 final class AppController {
     
-    private let authenticationManager: AuthenticationService
+    private let authenticationService: AuthenticationService
+    private let libraryService: LibraryService
     private let consoleView = ConsoleView()
     
-    init(authenticationManager: AuthenticationService) {
-        self.authenticationManager = authenticationManager
+    init(authenticationService: AuthenticationService, libraryService: LibraryService) {
+        self.authenticationService = authenticationService
+        self.libraryService = libraryService
     }
     
     func start() {
@@ -28,7 +30,7 @@ final class AppController {
         case .register:
             register()
         case .exit:
-            consoleView.showMessage("Thank you for using the Library System. Goodbye!")
+            print("Thank you for using the Library System. Goodbye!")
             exit(0)
         }
     }
@@ -51,13 +53,13 @@ final class AppController {
     }
     
     private func login(as role: UserRole) {
-        consoleView.showMessage("=== \(role == .librarian ? "Librarian" : "User") Login ===")
+        print("=== \(role == .librarian ? "Librarian" : "User") Login ===")
         
         let email = InputUtils.readString("Enter email")
         let password = InputUtils.readPassword()
         
         do {
-            let user = try authenticationManager.login(email: email, password: password)
+            let user = try authenticationService.login(email: email, password: password)
             
             guard user.role == role else {
                 consoleView.showError("You don't have permission to login as \(role.rawValue).")
@@ -65,11 +67,22 @@ final class AppController {
                 return
             }
             
-            consoleView.showMessage("Login successful! Welcome, \(user.name).")
+            print("Login successful! Welcome, \(user.name).")
             consoleView.waitForEnter()
             
-            // TODO: Transition to appropriate menu
-            // e.g., UserMenuController(user: user).start()
+            switch role {
+                    case .librarian:
+                        LibrarianController(
+                            currentUser: user,
+                            libraryService: libraryService
+                        ).start()
+
+                    case .user:
+                        UserController(
+                            currentUser: user,
+                            libraryService: libraryService
+                        ).start()
+                    }
             
         } catch {
             consoleView.showError("Login failed: \(error.localizedDescription)")
@@ -79,7 +92,7 @@ final class AppController {
     
     private func register() {
        
-        consoleView.showMessage("=== Register New User ===")
+         print("=== Register New User ===")
         
         let name = InputUtils.readString("Enter full name")
         let email = InputUtils.readString("Enter email")
@@ -96,16 +109,16 @@ final class AppController {
         let address = InputUtils.readString("Enter address")
         
         do {
-            try authenticationManager.register(
+            try authenticationService.register(
                 name: name,
                 email: email,
                 password: password,
                 phoneNumber: phone,
                 address: address,
-                role: .user  // Only users can register
+                role: .user  
             )
             
-            consoleView.showMessage("Registration successful!\nYou can now login with your credentials.")
+            print("Registration successful!\nYou can now login with your credentials.")
             consoleView.waitForEnter()
             
         } catch {

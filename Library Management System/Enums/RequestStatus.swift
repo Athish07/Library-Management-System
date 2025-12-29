@@ -1,7 +1,6 @@
-enum RequestStatus {
-    case pending
-    case approved
-    case rejected
-    case returned
+enum RequestStatus: String {
+    case pending = "Pending"
+    case issued = "Issued"
+    case rejected = "Rejected"
+    case returned = "Returned"
 }
-

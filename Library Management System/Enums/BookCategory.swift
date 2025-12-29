@@ -4,6 +4,8 @@ enum BookCategory: String, CaseIterable {
     case science = "Science"
     case technology = "Technology"
     case history = "History"
+    case programming = "Programming"
     case other = "Other"
+    
 }
 

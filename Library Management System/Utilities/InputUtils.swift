@@ -55,7 +55,7 @@ struct InputUtils {
     static func readMenuChoice<T: CaseIterable & RawRepresentable>(
         from options: [T],
         prompt: String = "Enter your choice"
-    ) -> T? where T.RawValue == String {
+    ) -> T? {
         
         let max = options.count
         

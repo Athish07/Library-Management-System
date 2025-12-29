@@ -58,3 +58,37 @@ final class AuthenticationManager: AuthenticationService {
     }
 }
 
+extension AuthenticationManager {
+
+    func seedDemoDetails(userRepository: any UserRepository) {
+
+        if userRepository.findByEmail("athish@gmail.com") == nil {
+            let hashed = hash("athish")
+
+            let librarian = User(
+                name: "Head Librarian",
+                email: "athish@gmail.com",
+                password: hashed,
+                phoneNumber: "8148847642",
+                address: "Main Library Building",
+                role: .librarian
+            )
+
+            userRepository.save(librarian)
+        }
+
+        if userRepository.findByEmail("user@gamil.com") == nil {
+            let hashed = hash("athish")
+
+            let testUser = User(
+                name: "Test User",
+                email: "user@gmail.com",
+                password: hashed,
+                phoneNumber: "7904411578",
+                address: "123 Test Street",
+                role: .user
+            )
+            userRepository.save(testUser)
+        }
+    }
+}

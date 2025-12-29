@@ -63,7 +63,7 @@ extension AuthenticationManager {
     func seedDemoDetails(userRepository: any UserRepository) {
 
         if userRepository.findByEmail("athish@gmail.com") == nil {
-            let hashed = hash("athish")
+            let hashed = hash("Athish_07")
 
             let librarian = User(
                 name: "Head Librarian",
@@ -78,7 +78,7 @@ extension AuthenticationManager {
         }
 
         if userRepository.findByEmail("user@gamil.com") == nil {
-            let hashed = hash("athish")
+            let hashed = hash("Athish_07")
 
             let testUser = User(
                 name: "Test User",

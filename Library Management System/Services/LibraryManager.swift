@@ -207,8 +207,6 @@ extension LibraryManager {
             guard getAllBooks().isEmpty else {
                 return
             }
-            
-            print("Seeding initial data...")
         
             try? addBook(title: "Swift Programming: The Big Nerd Ranch Guide",
                          author: "Mikey Ward",
@@ -244,8 +242,6 @@ extension LibraryManager {
                          author: "Carl Sagan",
                          category: .science,
                          totalCopies: 2)
-            
-            print("7 books added.")
         }
     
 }

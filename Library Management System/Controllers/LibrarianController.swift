@@ -19,7 +19,6 @@ final class LibrarianController {
             
             guard let choice = InputUtils.readMenuChoice(from: LibrarianMenuOption.allCases) else {
                 consoleView.showError("Invalid choice")
-                consoleView.waitForEnter()
                 continue
             }
             
@@ -34,7 +33,6 @@ final class LibrarianController {
                 viewAllIssuedBooks()
             case .logout:
                 print("You have been logged out from Librarian mode.")
-                consoleView.waitForEnter()
                 return
             }
         }
@@ -55,14 +53,12 @@ final class LibrarianController {
         let categoryInput = InputUtils.readString("Enter category")
         guard let category = BookCategory(rawValue: categoryInput.lowercased()) else {
             consoleView.showError("Invalid category")
-            consoleView.waitForEnter()
             return
         }
         
         let copies = InputUtils.readInt("Enter number of copies", allowCancel: false) ?? 0
         guard copies > 0 else {
             consoleView.showError("Number of copies must be greater than 0")
-            consoleView.waitForEnter()
             return
         }
         
@@ -77,7 +73,6 @@ final class LibrarianController {
         } catch {
             consoleView.showError("Failed to add book: \(error.localizedDescription)")
         }
-        consoleView.waitForEnter()
     }
     
     private func removeBook() {
@@ -85,16 +80,17 @@ final class LibrarianController {
         
         if books.isEmpty {
             print("No books in the library.")
-            consoleView.waitForEnter()
             return
         }
+        print("All books in the library:")
         
-       // consoleView.showBooks(books, title: "All Books in Library")
+        for book in books {
+            consoleView.printBookDetails(book)
+        }
         
         let index = InputUtils.readInt("Enter book number to remove (or press Enter to cancel)", allowCancel: true)
         guard let idx = index, idx >= 1 && idx <= books.count else {
             print("Remove cancelled.")
-            consoleView.waitForEnter()
             return
         }
         
@@ -102,11 +98,10 @@ final class LibrarianController {
         
         do {
             try libraryService.removeBook(bookId: book.bookId)
-            print("🗑️ Book '\(book.title)' removed successfully.")
+            print("Book '\(book.title)' removed successfully.")
         } catch {
             consoleView.showError("Failed to remove book: \(error.localizedDescription)")
         }
-        consoleView.waitForEnter()
     }
     
     private func viewAndManagePendingRequests() {
@@ -115,9 +110,10 @@ final class LibrarianController {
         
         if requests.isEmpty {
             print("No pending borrow requests.")
-            consoleView.waitForEnter()
             return
         }
+        
+        // if need i can use view for this as well.
         
         print("Pending Borrow Requests (\(requests.count)):")
         
@@ -145,7 +141,8 @@ final class LibrarianController {
         print("Manage Request for Book ID: \(selected.bookId.uuidString.prefix(8))")
         
         guard let action = InputUtils.readMenuChoice(
-            from: BorrowRequestAction.allCases
+            from: BorrowRequestAction.allCases,
+            prompt: "Enter your Choice(press ENTER to move back)"
         ) else {
             return
         }
@@ -170,7 +167,6 @@ final class LibrarianController {
                print(error.localizedDescription)
             }
         
-            consoleView.waitForEnter()
     }
     
     private func viewAllIssuedBooks() {
@@ -183,13 +179,12 @@ final class LibrarianController {
             for issuedBook in issued {
                 do {
                     let book = try libraryService.getBook(bookId: issuedBook.bookId)
-                    //consoleView.showBorrowedBook(book, issued: issuedBook)
+                    showBorrowedBook(book,issuedBook)
                 } catch {
                     print("Issued Book ID: \(issuedBook.issueId.uuidString.prefix(8)) (Book missing)")
                 }
             }
         }
-        consoleView.waitForEnter()
     }
     
     private func formatDate(_ date: Date) -> String {
@@ -197,5 +192,22 @@ final class LibrarianController {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+}
+
+extension LibrarianController {
+    
+    // I am using this only in the libraryController
+    
+    func showBorrowedBook(_ book: Book,_ issued: IssuedBook) {
+        print("""
+              Issued Book Details : 
+              Book Title: \(book.title)
+              Book Author: \(book.author)
+              Book Category: \(book.category)
+              Issued Date : \(issued.issueDate)
+              Due Date: \(issued.dueDate)
+              Days OverDued: \(issued.daysOverdue)
+              """)
     }
 }

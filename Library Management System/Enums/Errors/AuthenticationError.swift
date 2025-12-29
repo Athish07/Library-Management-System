@@ -4,7 +4,7 @@ enum AuthenticationError: Error {
     case invalidPassword
     case userAlreadyExists
 
-    var errorDescription: String? {
+    var errorDescrxiption: String? {
         switch self {
         case .userNotFound:
             return "No user found with this email."

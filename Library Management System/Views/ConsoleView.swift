@@ -17,18 +17,14 @@ final class ConsoleView {
     func showError(_ message: String) {
         print("\nERROR:\(message)\n")
     }
-
-    func waitForEnter() {
-        print("Press Enter to continue...")
-        _ = readLine()
-    }
+    
+    // I am using it in different files.
     
     func printBookDetails(_ book: Book) {
         print("\(book.title)")
         print("Author: \(book.author)")
         print("Category: \(book.category.rawValue)")
         print("Available: \(book.availableCopies)/\(book.totalCopies)")
-        print("")
     }
     
 }

@@ -36,9 +36,9 @@ final class AppController {
     }
     
     private func showLoginRoleMenu() {
-        consoleView.showMenu(LoginRoleMenu.allCases, title: "Login As")
+        consoleView.showMenu(UserRole.allCases, title: "Login As")
         
-        guard let choice = InputUtils.readMenuChoice(from: LoginRoleMenu.allCases) else {
+        guard let choice = InputUtils.readMenuChoice(from: UserRole.allCases, prompt: "Enter your choice(press ENTER to move back)") else {
             return
         }
         
@@ -47,28 +47,26 @@ final class AppController {
             login(as: .librarian)
         case .user:
             login(as: .user)
-        case .back:
-            return
         }
     }
     
     private func login(as role: UserRole) {
         print("=== \(role == .librarian ? "Librarian" : "User") Login ===")
         
-        let email = InputUtils.readString("Enter email")
-        let password = InputUtils.readPassword()
+        let email = InputUtils.readEmail("Enter email")
+        let password = InputUtils.readValidatedPassword()
         
         do {
             let user = try authenticationService.login(email: email, password: password)
             
             guard user.role == role else {
                 consoleView.showError("You don't have permission to login as \(role.rawValue).")
-                consoleView.waitForEnter()
+                
                 return
             }
             
             print("Login successful! Welcome, \(user.name).")
-            consoleView.waitForEnter()
+           
             
             switch role {
                     case .librarian:
@@ -86,7 +84,7 @@ final class AppController {
             
         } catch {
             consoleView.showError("Login failed: \(error.localizedDescription)")
-            consoleView.waitForEnter()
+           
         }
     }
     
@@ -95,13 +93,12 @@ final class AppController {
          print("=== Register New User ===")
         
         let name = InputUtils.readString("Enter full name")
-        let email = InputUtils.readString("Enter email")
-        let password = InputUtils.readPassword("Enter password")
-        let confirm = InputUtils.readPassword("Confirm password")
+        let email = InputUtils.readEmail("Enter email")
+        let password = InputUtils.readValidatedPassword("Enter password")
+        let confirm = InputUtils.readValidatedPassword("Confirm password")
         
         guard password == confirm else {
             consoleView.showError("Passwords do not match.")
-            consoleView.waitForEnter()
             return
         }
         
@@ -119,11 +116,9 @@ final class AppController {
             )
             
             print("Registration successful!\nYou can now login with your credentials.")
-            consoleView.waitForEnter()
             
         } catch {
             consoleView.showError("Registration failed: \(error.localizedDescription)")
-            consoleView.waitForEnter()
         }
     }
 }

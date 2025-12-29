@@ -23,7 +23,6 @@ final class UserController {
                 )
             else {
                 consoleView.showError("Invalid choice")
-                consoleView.waitForEnter()
                 continue
             }
             
@@ -35,7 +34,6 @@ final class UserController {
             case .returnBook: returnBook()
             case .logout:
                 print("You have been logged out successfully.")
-                consoleView.waitForEnter()
                 return
             }
         }
@@ -57,7 +55,6 @@ final class UserController {
                 consoleView.printBookDetails(book)
             }
         }
-        consoleView.waitForEnter()
     }
     
     private func viewAvailableBooks() {
@@ -72,7 +69,6 @@ final class UserController {
                 consoleView.printBookDetails(book)
             }
         }
-        consoleView.waitForEnter()
     }
     
     private func viewMyBorrowedBooks() {
@@ -106,7 +102,6 @@ final class UserController {
             }
         }
         
-        consoleView.waitForEnter()
     }
     
     private func requestBorrowBook() {
@@ -114,7 +109,6 @@ final class UserController {
         
         if books.isEmpty {
             print("No books available to borrow right now.")
-            consoleView.waitForEnter()
             return
         }
         
@@ -132,7 +126,6 @@ final class UserController {
             index >= 1 && index <= books.count
         else {
             print("Borrow request cancelled.")
-            consoleView.waitForEnter()
             return
         }
         
@@ -151,7 +144,6 @@ final class UserController {
                 "Failed to send request: \(error.localizedDescription)"
             )
         }
-        consoleView.waitForEnter()
     }
     
     private func returnBook() {
@@ -159,7 +151,6 @@ final class UserController {
         
         if borrowed.isEmpty {
             print("You have no books to return.")
-            consoleView.waitForEnter()
             return
         }
         
@@ -186,7 +177,6 @@ final class UserController {
                 index >= 1 && index <= borrowed.count
             else {
                 print("Return cancelled.")
-                consoleView.waitForEnter()
                 return
             }
             
@@ -208,7 +198,6 @@ final class UserController {
                     "Return failed: \(error.localizedDescription)"
                 )
             }
-            consoleView.waitForEnter()
         }
     }
     

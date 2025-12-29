@@ -170,7 +170,7 @@ final class UserController {
                     print("\(index + 1). ", terminator: "")
                     consoleView.printBookDetails(book)
                     print(
-                        " Due: \(formatDate(issued.dueDate)) \(issued.isOverdue ? "⚠️ OVERDUE" : "")"
+                        " Due: \(formatDate(issued.dueDate)) \(issued.isOverdue ? "OVERDUE" : "")"
                     )
             }catch {
                 consoleView.showError(
@@ -220,4 +220,6 @@ final class UserController {
     }
     
 }
+
+
 

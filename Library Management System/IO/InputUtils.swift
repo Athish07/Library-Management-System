@@ -60,7 +60,7 @@ struct InputUtils {
         let max = options.count
         
         while true {
-            guard let index = readInt("\(prompt) (1–\(max), or press Enter to go back)", allowCancel: true),
+            guard let index = readInt("\(prompt) (1–\(max), or press -1 to go back)", allowCancel: true),
                   index >= 1 && index <= max else {
                 return nil
             }

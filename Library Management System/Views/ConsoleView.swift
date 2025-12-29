@@ -15,14 +15,13 @@ final class ConsoleView {
     }
     
     func showError(_ message: String) {
-        print("\n\(message)\n")
+        print("\nERROR:\(message)\n")
     }
 
     func waitForEnter() {
         print("Press Enter to continue...")
         _ = readLine()
     }
-    
     
     func printBookDetails(_ book: Book) {
         print("\(book.title)")
@@ -31,5 +30,5 @@ final class ConsoleView {
         print("Available: \(book.availableCopies)/\(book.totalCopies)")
         print("")
     }
-
+    
 }

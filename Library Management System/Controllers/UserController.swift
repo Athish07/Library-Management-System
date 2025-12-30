@@ -106,8 +106,8 @@ final class UserController {
                 do {
                     let book = try libraryService.getBook(bookId: issued.bookId)
                     consoleView.printBookDetails(book)
-                    print("   Issued: \(formatDate(issued.issueDate))")
-                    print("   Due: \(formatDate(issued.dueDate))")
+                    print("   Issued: \((issued.issueDate))")
+                    print("   Due: \(issued.dueDate.formattedMediumDateTime())")
                     if issued.isOverdue {
                         let days = issued.daysOverdue
                         print("OVERDUE by \(days) day(s) - Fine: $\(days).00")
@@ -180,7 +180,7 @@ final class UserController {
                 print("\(index + 1). ", terminator: "")
                 consoleView.printBookDetails(book)
                 print(
-                    " Due: \(formatDate(issued.dueDate)) \(issued.isOverdue ? "OVERDUE" : "")"
+                    " Due: \(issued.dueDate.formattedMediumDateTime()) \(issued.isOverdue ? "OVERDUE" : "")"
                 )
             }catch {
                 consoleView.showError(
@@ -219,14 +219,6 @@ final class UserController {
             }
         }
     }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-    
 }
 
 extension UserController {

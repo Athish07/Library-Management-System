@@ -65,15 +65,21 @@ final class LibrarianController {
         consoleView
             .showMenu(BookCategory.allCases, title: "Available categories.")
         
-        guard let category = InputUtils.readMenuChoice(from: BookCategory.allCases) else {
+        guard
+            let category = InputUtils.readMenuChoice(
+                from: BookCategory.allCases,
+                prompt: "Enter your choice(press ENTER to move back)"
+            )
+        else {
             return
         }
-        
-        let copies = InputUtils.readInt(
-            "Enter number of copies",
-            allowCancel: false
-        ) ?? 0
-        guard copies > 0 else {
+       
+        guard
+            let copies = InputUtils.readInt(
+                "Enter number of copies",
+                allowCancel: false
+            ), copies > 0
+        else {
             consoleView.showError("Number of copies must be greater than 0")
             return
         }
@@ -106,10 +112,12 @@ final class LibrarianController {
             consoleView.printBookDetails(book)
         }
         
-        guard let index = InputUtils.readInt(
-            "Enter book number to remove (or press Enter to cancel)",
-            allowCancel: true
-        ), (1...books.count).contains(index) else {
+        guard
+            let index = InputUtils.readInt(
+                "Enter book number to remove (or press Enter to cancel)",
+                allowCancel: true
+            ), (1...books.count).contains(index)
+        else {
             print("Remove cancelled.")
             return
         }
@@ -144,7 +152,7 @@ final class LibrarianController {
                 print("\(index + 1).")
                 consoleView.printBookDetails(book)
                 
-                print("Request Date: \(formatDate(request.requestDate))")
+                print("Request Date: \(request.requestDate.formattedMediumDateTime())")
                 print(
                     "Requested By: \(userService.getUserById(userId)?.name ?? "Unknown")"
                 )
@@ -237,13 +245,6 @@ final class LibrarianController {
             userService: userService,
             view: consoleView
         )
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
     }
 }
 

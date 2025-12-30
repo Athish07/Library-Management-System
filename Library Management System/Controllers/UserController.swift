@@ -5,12 +5,13 @@ final class UserController {
     private let userId: UUID
     private let libraryService: LibraryService
     private let userService: UserService
-    private let consoleView = ConsoleView()
+    private let consoleView: ConsoleView
     
-    init(currentUserId: UUID, libraryService: LibraryService, userService: UserService) {
+    init(currentUserId: UUID, libraryService: LibraryService, userService: UserService, consoleView: ConsoleView) {
         self.userId = currentUserId
         self.libraryService = libraryService
         self.userService = userService
+        self.consoleView = consoleView
     }
     
     func start() {

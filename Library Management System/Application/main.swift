@@ -4,6 +4,8 @@ let requestRepository: BorrowRequestRepository =
     InMemoryBorrowRequestRepository()
 let issuedRepository: IssuedBookRepository = InMemoryIssuedBookRepository()
 
+let consoleView = ConsoleView()
+
 let authenticationService: AuthenticationService =
     AuthenticationManager(userRepository: userRepository)
 let libraryService: LibraryService = LibraryManager(
@@ -20,6 +22,9 @@ libraryService.seedBookData()
 let appController = AppController(
     authenticationService: authenticationService,
     libraryService: libraryService,
-    userService: userService
+    userService: userService,
+    consoleView: consoleView
 )
+
 appController.start()
+

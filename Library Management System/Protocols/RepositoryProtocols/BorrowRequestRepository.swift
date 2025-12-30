@@ -5,5 +5,4 @@ protocol BorrowRequestRepository {
     func findById(_ requestId: UUID) -> BorrowRequest?
     func getAllRequests() -> [BorrowRequest]
     func getPendingRequests() -> [BorrowRequest]
-    func getRequests(for userId: UUID) -> [BorrowRequest]
 }

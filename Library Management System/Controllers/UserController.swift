@@ -2,17 +2,19 @@ import Foundation
 
 final class UserController {
     
-    private let currentUser: User
+    private let userId: UUID
     private let libraryService: LibraryService
+    private let userService: UserService
     private let consoleView = ConsoleView()
     
-    init(currentUser: User, libraryService: LibraryService) {
-        self.currentUser = currentUser
+    init(currentUserId: UUID, libraryService: LibraryService, userService: UserService) {
+        self.userId = currentUserId
         self.libraryService = libraryService
+        self.userService = userService
     }
     
     func start() {
-        print("Welcome to the Library, \(currentUser.name)!")
+        print("Welcome to the Library")
         
         while true {
             consoleView.showMenu(UserMenuOption.allCases, title: "USER MENU")
@@ -32,6 +34,8 @@ final class UserController {
             case .viewMyBorrowedBooks: viewMyBorrowedBooks()
             case .requestBorrow: requestBorrowBook()
             case .returnBook: returnBook()
+            case .viewProfile: viewProfile()
+            case .updateProfile: updateProfile()
             case .logout:
                 print("You have been logged out successfully.")
                 return
@@ -45,7 +49,7 @@ final class UserController {
             "Enter search term (title/author/category)"
         )
         
-        let results = libraryService.searchBooks(by: query)
+        let results = libraryService.search(by: query)
         
         if results.isEmpty {
             print(" No books found matching '\(query)'.")
@@ -55,6 +59,23 @@ final class UserController {
                 consoleView.printBookDetails(book)
             }
         }
+    }
+    
+    private func viewProfile() {
+        
+        guard let user = userService.getUserById(userId) else {
+            return
+        }
+        
+        consoleView.printUserDetails(user)
+    }
+    
+    private func updateProfile() {
+        ProfileFlowHelper.handleProfileUpdate(
+            userId: userId,
+            userService: userService,
+            view: consoleView
+        )
     }
     
     private func viewAvailableBooks() {
@@ -73,7 +94,7 @@ final class UserController {
     
     private func viewMyBorrowedBooks() {
         
-        let borrowed = libraryService.getBorrowedBooks(for: currentUser.userId)
+        let borrowed = libraryService.getBorrowedBooks(for: userId)
         
         if borrowed.isEmpty {
             print("You have no borrowed books.")
@@ -134,7 +155,7 @@ final class UserController {
         do {
             try libraryService.requestBorrow(
                 bookId: selectedBook.bookId,
-                by: currentUser.userId
+                by: userId
             )
             print(
                 " Borrow request sent for '\(selectedBook.title)'!\nLibrarian will review it soon."
@@ -147,7 +168,7 @@ final class UserController {
     }
     
     private func returnBook() {
-        let borrowed = libraryService.getBorrowedBooks(for: currentUser.userId)
+        let borrowed = libraryService.getBorrowedBooks(for: userId)
         
         if borrowed.isEmpty {
             print("You have no books to return.")
@@ -158,11 +179,11 @@ final class UserController {
         for (index, issued) in borrowed.enumerated() {
             do {
                 let book = try libraryService.getBook(bookId: issued.bookId)
-                    print("\(index + 1). ", terminator: "")
-                    consoleView.printBookDetails(book)
-                    print(
-                        " Due: \(formatDate(issued.dueDate)) \(issued.isOverdue ? "OVERDUE" : "")"
-                    )
+                print("\(index + 1). ", terminator: "")
+                consoleView.printBookDetails(book)
+                print(
+                    " Due: \(formatDate(issued.dueDate)) \(issued.isOverdue ? "OVERDUE" : "")"
+                )
             }catch {
                 consoleView.showError(
                     "Could not load book details for issue \(issued.issueId.uuidString.prefix(8))"

@@ -3,11 +3,13 @@ final class AppController {
     
     private let authenticationService: AuthenticationService
     private let libraryService: LibraryService
+    private let userService: UserService
     private let consoleView = ConsoleView()
     
-    init(authenticationService: AuthenticationService, libraryService: LibraryService) {
+    init(authenticationService: AuthenticationService, libraryService: LibraryService, userService: UserService) {
         self.authenticationService = authenticationService
         self.libraryService = libraryService
+        self.userService = userService
     }
     
     func start() {
@@ -71,14 +73,16 @@ final class AppController {
             switch role {
                     case .librarian:
                         LibrarianController(
-                            currentUser: user,
-                            libraryService: libraryService
+                            currentUserId: user.userId,
+                            libraryService: libraryService,
+                            userService: userService
                         ).start()
 
                     case .user:
                         UserController(
-                            currentUser: user,
-                            libraryService: libraryService
+                            currentUserId: user.userId,
+                            libraryService: libraryService,
+                            userService: userService
                         ).start()
                     }
             

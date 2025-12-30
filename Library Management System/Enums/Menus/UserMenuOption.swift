@@ -4,6 +4,8 @@ enum UserMenuOption: String, CaseIterable {
     case viewMyBorrowedBooks = "View My Borrowed Books"
     case requestBorrow = "Request to Borrow a Book"
     case returnBook = "Return a Book"
+    case viewProfile = "View Profile"
+    case updateProfile = "Update Profile"
     case logout = "Logout"
     
 }

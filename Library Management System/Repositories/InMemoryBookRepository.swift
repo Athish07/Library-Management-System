@@ -21,37 +21,4 @@ final class InMemoryBookRepository: BookRepository {
         }
     }
 
-    func search(byTitle title: String) -> [Book] {
-        books.values.filter {
-            $0.title.lowercased().contains(title.lowercased())
-        }
-    }
-
-    func search(byAuthor author: String) -> [Book] {
-        books.values.filter {
-            $0.author.lowercased().contains(author.lowercased())
-        }
-    }
-
-    func search(byCategory category: BookCategory) -> [Book] {
-        books.values.filter { $0.category == category }
-    }
-
-    func search(by query: String) -> [Book] {
-        let lowerQuery = query.lowercased()
-        return books.values.filter { book in
-            book.title.lowercased().contains(lowerQuery)
-                || book.author.lowercased().contains(lowerQuery)
-                || book.category.rawValue.lowercased().contains(lowerQuery)
-        }
-        .sorted { $0.title.lowercased() < $1.title.lowercased() }
-    }
-
-    func isAvailable(_ bookId: UUID) -> Bool {
-        books[bookId]?.availableCopies ?? 0 > 0
-    }
-
-    func availableCount(for bookId: UUID) -> Int {
-        books[bookId]?.availableCopies ?? 0
-    }
 }

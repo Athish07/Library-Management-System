@@ -1,22 +1,25 @@
-let bookRepo: BookRepository = InMemoryBookRepository()
-let userRepo: UserRepository = InMemoryUserRepository()
-let requestRepo: BorrowRequestRepository =
+let bookRepository: BookRepository = InMemoryBookRepository()
+let userRepository: UserRepository = InMemoryUserRepository()
+let requestRepository: BorrowRequestRepository =
     InMemoryBorrowRequestRepository()
-let issuedRepo: IssuedBookRepository = InMemoryIssuedBookRepository()
+let issuedRepository: IssuedBookRepository = InMemoryIssuedBookRepository()
 
 let authenticationService: AuthenticationService =
-    AuthenticationManager(userRepository: userRepo)
+    AuthenticationManager(userRepository: userRepository)
 let libraryService: LibraryService = LibraryManager(
-    bookRepository: bookRepo,
-    borrowRequestRepository: requestRepo,
-    issuedBookRepository: issuedRepo
+    bookRepository: bookRepository,
+    borrowRequestRepository: requestRepository,
+    issuedBookRepository: issuedRepository
 )
 
-authenticationService.seedDemoDetails(userRepository: userRepo)
+let userService = UserManager(userRepository: userRepository)
+
+authenticationService.seedDemoDetails(userRepository: userRepository)
 libraryService.seedBookData()
 
 let appController = AppController(
     authenticationService: authenticationService,
-    libraryService: libraryService
+    libraryService: libraryService,
+    userService: userService
 )
 appController.start()

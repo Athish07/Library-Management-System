@@ -23,9 +23,4 @@ final class InMemoryBorrowRequestRepository: BorrowRequestRepository {
             .sorted { $0.requestDate < $1.requestDate }
     }
     
-    func getRequests(for userId: UUID) -> [BorrowRequest] {
-        requests.values
-            .filter { $0.userId == userId }
-            .sorted { $0.requestDate > $1.requestDate }
-    }
 }

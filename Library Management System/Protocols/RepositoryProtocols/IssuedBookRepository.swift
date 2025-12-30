@@ -3,7 +3,5 @@ import Foundation
 protocol IssuedBookRepository {
     func save(_ issuedBook: IssuedBook)
     func findById(_ issueId: UUID) -> IssuedBook?
-    func getIssuedBooks(for userId: UUID) -> [IssuedBook]
     func getAllIssuedBooks() -> [IssuedBook]
-    func getActiveIssuedBooks(for userId: UUID) -> [IssuedBook]
 }

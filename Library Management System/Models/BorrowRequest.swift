@@ -20,21 +20,18 @@ struct BorrowRequest {
 
 extension BorrowRequest {
 
-    @discardableResult
     mutating func issue() -> Bool {
         guard status == .pending else { return false }
         status = .issued
         return true
     }
-
-    @discardableResult
+    
     mutating func reject() -> Bool {
         guard status == .pending else { return false }
         status = .rejected
         return true
     }
     
-    @discardableResult
     mutating func markReturned() -> Bool {
         guard status == .issued else { return false }
         status = .returned

@@ -2,7 +2,7 @@ import Foundation
 
 protocol LibraryService {
     
-    func searchBooks(by query: String) -> [Book]
+    func search(by query: String) -> [Book]
     func getAvailableBooks() -> [Book]
     func requestBorrow(bookId: UUID, by userId: UUID) throws
     func getBorrowedBooks(for userId: UUID) -> [IssuedBook]

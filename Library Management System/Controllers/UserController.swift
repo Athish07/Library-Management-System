@@ -17,11 +17,11 @@ final class UserController {
         print("Welcome to the Library")
         
         while true {
-            consoleView.showMenu(UserMenuOption.allCases, title: "USER MENU")
+            consoleView.showMenu(MenuOption.allCases, title: "USER MENU")
             
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: UserMenuOption.allCases
+                    from: MenuOption.allCases
                 )
             else {
                 consoleView.showError("Invalid choice")
@@ -111,13 +111,10 @@ final class UserController {
                         let days = issued.daysOverdue
                         print("OVERDUE by \(days) day(s) - Fine: $\(days).00")
                     }
-                    print(
-                        "Issue ID: \(issued.issueId.uuidString.prefix(8))...\n"
-                    )
                     print("---")
                 } catch {
                     consoleView.showError(
-                        "Could not load book details for issue \(issued.issueId.uuidString.prefix(8))"
+                        "Could not load book details."
                     )
                 }
             }
@@ -186,7 +183,7 @@ final class UserController {
                 )
             }catch {
                 consoleView.showError(
-                    "Could not load book details for issue \(issued.issueId.uuidString.prefix(8))"
+                    "Could not load book details."
                 )
             }
             
@@ -231,5 +228,19 @@ final class UserController {
     
 }
 
+extension UserController {
+    
+    enum MenuOption: String, CaseIterable {
+        case searchBooks = "Search Books"
+        case viewAvailableBooks = "View All Available Books"
+        case viewMyBorrowedBooks = "View My Borrowed Books"
+        case requestBorrow = "Request to Borrow a Book"
+        case returnBook = "Return a Book"
+        case viewProfile = "View Profile"
+        case updateProfile = "Update Profile"
+        case logout = "Logout"
+    }
+    
+}
 
 

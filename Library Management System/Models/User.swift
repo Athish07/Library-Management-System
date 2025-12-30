@@ -8,8 +8,14 @@ struct User: Equatable {
     var password: String
     var phoneNumber: String
     var address: String
-    let role: UserRole
-
+    let role: Role
+    
+    enum Role: String, CaseIterable {
+        case user = "User"
+        case librarian = "Librarian"
+        
+    }
+    
     init(
         userId: UUID = UUID(),
         name: String,
@@ -17,7 +23,7 @@ struct User: Equatable {
         password: String,
         phoneNumber: String,
         address: String,
-        role: UserRole
+        role: Role
     ) {
         self.userId = userId
         self.name = name
@@ -29,4 +35,5 @@ struct User: Equatable {
     }
     
 }
+typealias UserRole = User.Role
 

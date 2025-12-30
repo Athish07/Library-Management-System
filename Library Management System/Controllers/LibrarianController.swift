@@ -1,12 +1,12 @@
 import Foundation
 
 final class LibrarianController {
-
+    
     private let userId: UUID
     private let libraryService: LibraryService
     private let userService: UserService
     private let consoleView = ConsoleView()
-
+    
     init(
         currentUserId: UUID,
         libraryService: LibraryService,
@@ -16,25 +16,25 @@ final class LibrarianController {
         self.libraryService = libraryService
         self.userService = userService
     }
-
+    
     func start() {
         print("Librarian Mode")
-
+        
         while true {
             consoleView.showMenu(
-                LibrarianMenuOption.allCases,
+                MenuOption.allCases,
                 title: "LIBRARIAN MENU"
             )
-
+            
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: LibrarianMenuOption.allCases
+                    from: MenuOption.allCases
                 )
             else {
                 consoleView.showError("Invalid choice")
                 continue
             }
-
+            
             switch choice {
             case .addBook:
                 addBook()
@@ -52,32 +52,30 @@ final class LibrarianController {
             }
         }
     }
-
+    
     private func addBook() {
-
+        
         print("=== Add New Book ===")
-
+        
         let title = InputUtils.readString("Enter book title")
         let author = InputUtils.readString("Enter author name")
-
-        print("Available categories:")
-        for category in BookCategory.allCases {
-            print("  • \(category.rawValue.capitalized)")
-        }
-
-        let categoryInput = InputUtils.readString("Enter category")
-        guard let category = BookCategory(rawValue: categoryInput.lowercased())
-        else {
-            consoleView.showError("Invalid category")
+        
+        consoleView
+            .showMenu(BookCategory.allCases, title: "Available categories.")
+        
+        guard let category = InputUtils.readMenuChoice(from: BookCategory.allCases) else {
             return
         }
-
-        let copies = InputUtils.readInt("Enter number of copies", allowCancel: false) ?? 0
+        
+        let copies = InputUtils.readInt(
+            "Enter number of copies",
+            allowCancel: false
+        ) ?? 0
         guard copies > 0 else {
             consoleView.showError("Number of copies must be greater than 0")
             return
         }
-
+        
         do {
             try libraryService.addBook(
                 title: title,
@@ -92,31 +90,30 @@ final class LibrarianController {
             )
         }
     }
-
+    
     private func removeBook() {
         let books = libraryService.getAllBooks()
-
+        
         if books.isEmpty {
             print("No books in the library.")
             return
         }
         print("All books in the library:")
-
+        
         for book in books {
             consoleView.printBookDetails(book)
         }
-
-        let index = InputUtils.readInt(
+        
+        guard let index = InputUtils.readInt(
             "Enter book number to remove (or press Enter to cancel)",
             allowCancel: true
-        )
-        guard let idx = index, idx >= 1 && idx <= books.count else {
+        ), (1...books.count).contains(index) else {
             print("Remove cancelled.")
             return
         }
-
-        let book = books[idx - 1]
-
+        
+        let book = books[index - 1]
+        
         do {
             try libraryService.removeBook(bookId: book.bookId)
             print("Book '\(book.title)' removed successfully.")
@@ -126,53 +123,54 @@ final class LibrarianController {
             )
         }
     }
-
+    
     private func viewAndManagePendingRequests() {
-
+        
         let requests = libraryService.getAllPendingRequests()
-
+        
         if requests.isEmpty {
             print("No pending borrow requests.")
             return
         }
         
         print("Pending Borrow Requests (\(requests.count)):")
-
+        
         for (index, request) in requests.enumerated() {
             do {
                 let book = try libraryService.getBook(bookId: request.bookId)
-
+                
                 print("\(index + 1).")
                 consoleView.printBookDetails(book)
-
+                
                 print("Request Date: \(formatDate(request.requestDate))")
-                print("Requested By: \(userService.getUserById(userId)?.name ?? "Unknown")")
+                print(
+                    "Requested By: \(userService.getUserById(userId)?.name ?? "Unknown")"
+                )
                 print("---")
             } catch {
-                print(
-                    "\(index + 1). Request ID: \(request.requestId.uuidString.prefix(8)) (Book not found)"
-                )
+                consoleView.showError("Book not found")
             }
         }
-
-        let choice = InputUtils.readInt(
-            "Enter request number to manage (or press Enter to go back)",
-            allowCancel: true
-        )
         
-        guard let idx = choice, idx >= 1 && idx <= requests.count else {
+        guard
+            let choice = InputUtils.readInt(
+                "Enter request number to manage (or press Enter to go back)",
+                allowCancel: true
+            )
+        else {
             return
         }
-
-        let selected = requests[idx - 1]
+        
+        let selected = requests[choice - 1]
+        
         consoleView.showMenu(
             BorrowRequestAction.allCases,
             title: "Manage Borrow Request"
         )
         print(
-            "Manage Request for Book ID: \(selected.bookId.uuidString.prefix(8))"
+            "Manage Request for Book ID: \(selected.bookId.uuidString.prefix(8))..."
         )
-
+        
         guard
             let action = InputUtils.readMenuChoice(
                 from: BorrowRequestAction.allCases,
@@ -181,7 +179,7 @@ final class LibrarianController {
         else {
             return
         }
-
+        
         do {
             switch action {
             case .issue:
@@ -199,12 +197,12 @@ final class LibrarianController {
         } catch {
             print(error.localizedDescription)
         }
-
+        
     }
-
+    
     private func viewAllIssuedBooks() {
         let issued = libraryService.getAllIssuedBooks()
-
+        
         if issued.isEmpty {
             print("No books currently issued.")
         } else {
@@ -216,31 +214,29 @@ final class LibrarianController {
                     )
                     showBorrowedBook(book, issuedBook)
                 } catch {
-                    print(
-                        "Issued Book ID: \(issuedBook.issueId.uuidString.prefix(8)) (Book missing)"
-                    )
+                    consoleView.showError("Book not found")
                 }
             }
         }
     }
-
+    
     private func viewProfile() {
-
+        
         guard let user = userService.getUserById(userId) else {
             return
         }
-
+        
         consoleView.printUserDetails(user)
     }
-
+    
     private func updateProfile() {
-       ProfileFlowHelper.handleProfileUpdate(
+        ProfileFlowHelper.handleProfileUpdate(
             userId: userId,
             userService: userService,
-               view: consoleView
-           )
+            view: consoleView
+        )
     }
-
+    
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -250,9 +246,27 @@ final class LibrarianController {
 }
 
 extension LibrarianController {
+    
+    enum MenuOption: String, CaseIterable {
+        case addBook = "Add New Book"
+        case removeBook = "Remove Book"
+        case viewPendingRequests = "View Pending Borrow Requests"
+        case viewAllIssuedBooks = "View All Issued Books"
+        case viewProfile = "View Profile"
+        case updateProfile = "Update Profile"
+        case logout = "Logout"
+        
+    }
+    
+    enum BorrowRequestAction: String, CaseIterable {
+        case issue = "Issue"
+        case reject = "Reject"
+    }
+    
+}
 
-    // I am using this only in the libraryController
-
+extension LibrarianController {
+    
     func showBorrowedBook(_ book: Book, _ issued: IssuedBook) {
         print(
             """
@@ -266,4 +280,5 @@ extension LibrarianController {
             """
         )
     }
+    
 }

@@ -53,3 +53,13 @@ final class UserManager: UserService {
         userRepository.findById(userId)
     }
 }
+
+extension UserManager {
+    
+   enum ProfileUpdateResult {
+        case success
+        case noChanges
+        case userNotFound
+    }
+    
+}

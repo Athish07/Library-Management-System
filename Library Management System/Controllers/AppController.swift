@@ -56,7 +56,7 @@ final class AppController {
         print("=== \(role == .librarian ? "Librarian" : "User") Login ===")
         
         let email = InputUtils.readEmail("Enter email")
-        let password = InputUtils.readValidatedPassword()
+        let password = InputUtils.readPassword()
         
         do {
             let user = try authenticationService.login(email: email, password: password)
@@ -98,15 +98,15 @@ final class AppController {
         
         let name = InputUtils.readString("Enter full name")
         let email = InputUtils.readEmail("Enter email")
-        let password = InputUtils.readValidatedPassword("Enter password")
-        let confirm = InputUtils.readValidatedPassword("Confirm password")
+        let password = InputUtils.readPassword("Enter password")
+        let confirm = InputUtils.readPassword("Confirm password")
         
         guard password == confirm else {
             consoleView.showError("Passwords do not match.")
             return
         }
         
-        let phone = InputUtils.readString("Enter phone number")
+        let phone = InputUtils.readPhoneNumber("Enter phone number")
         let address = InputUtils.readString("Enter address")
         
         do {
@@ -125,4 +125,15 @@ final class AppController {
             consoleView.showError("Registration failed: \(error.localizedDescription)")
         }
     }
+}
+
+extension AppController {
+    
+    enum PublicMenu: String, CaseIterable {
+        case login = "Login"
+        case register = "Register"
+        case exit = "Exit"
+        
+    }
+    
 }

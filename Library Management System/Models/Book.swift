@@ -4,14 +4,25 @@ struct Book {
     let bookId: UUID
     var title: String
     var author: String
-    var category: BookCategory
+    var category: Category
     let totalCopies: Int
     private(set) var availableCopies: Int
+    
+     enum Category: String, CaseIterable {
+        case fiction = "Fiction"
+        case nonFiction = "Non-Fiction"
+        case science = "Science"
+        case technology = "Technology"
+        case history = "History"
+        case programming = "Programming"
+        case other = "Other"
+        
+    }
 
     init(
         title: String,
         author: String,
-        category: BookCategory,
+        category: Category,
         totalCopies: Int
     ) {
 
@@ -22,6 +33,9 @@ struct Book {
         self.totalCopies = totalCopies
         self.availableCopies = totalCopies
     }
+    
+    
+
 
 }
 
@@ -38,3 +52,6 @@ extension Book {
         availableCopies += 1
     }
 }
+
+typealias BookCategory = Book.Category
+

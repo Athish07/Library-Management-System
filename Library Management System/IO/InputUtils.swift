@@ -99,7 +99,7 @@ struct InputUtils {
         ) != nil
     }
     
-    static func readValidatedPassword(
+    static func readPassword(
         _ prompt: String = "Password"
     ) -> String {
 

@@ -8,7 +8,14 @@ struct BorrowRequest {
     let requestDate: Date
 
     private(set) var status: RequestStatus
-
+    
+    enum RequestStatus: String {
+        case pending = "Pending"
+        case issued = "Issued"
+        case rejected = "Rejected"
+        case returned = "Returned"
+    }
+    
     init(userId: UUID, bookId: UUID) {
         self.requestId = UUID()
         self.userId = userId
@@ -38,3 +45,5 @@ extension BorrowRequest {
         return true
     }
 }
+
+typealias RequestStatus = BorrowRequest.RequestStatus

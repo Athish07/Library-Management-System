@@ -54,12 +54,3 @@ final class UserManager: UserService {
     }
 }
 
-extension UserManager {
-    
-   enum ProfileUpdateResult {
-        case success
-        case noChanges
-        case userNotFound
-    }
-    
-}

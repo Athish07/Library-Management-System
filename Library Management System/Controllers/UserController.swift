@@ -1,11 +1,11 @@
 import Foundation
 
-final class UserController {
+final class UserController: ProfileManageable {
     
-    private let userId: UUID
-    private let libraryService: LibraryService
-    private let userService: UserService
-    private let consolePrinter: ConsolePrinter
+     let userId: UUID
+     let userService: UserService
+     let consolePrinter: ConsolePrinter
+     private let libraryService: LibraryService
     
     init(
         currentUserId: UUID,
@@ -65,23 +65,6 @@ final class UserController {
                 consolePrinter.printBookDetails(book)
             }
         }
-    }
-    
-    private func viewProfile() {
-        
-        guard let user = userService.getUserById(userId) else {
-            return
-        }
-        
-        consolePrinter.printUserDetails(user)
-    }
-    
-    private func updateProfile() {
-        ProfileUpdateFlow.handleProfileUpdate(
-            userId: userId,
-            userService: userService,
-            consolePrinter: consolePrinter
-        )
     }
     
     private func viewAvailableBooks() {

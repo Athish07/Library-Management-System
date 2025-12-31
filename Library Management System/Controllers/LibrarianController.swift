@@ -1,13 +1,14 @@
 import Foundation
 
-final class LibrarianController {
+final class LibrarianController: ProfileManageable {
     
-    private let userId: UUID
+    let userId: UUID
+    let userService: UserService
+    let consolePrinter: ConsolePrinter
     private let libraryService: LibraryService
-    private let userService: UserService
     private let reportService: ReportService
-    private let consolePrinter: ConsolePrinter
     private let defaultBorrowPeriod: Int = 14
+    
     
     init(
         currentUserId: UUID,
@@ -303,23 +304,6 @@ final class LibrarianController {
                 }
             }
         }
-    }
-    
-    private func viewProfile() {
-        
-        guard let user = userService.getUserById(userId) else {
-            return
-        }
-        
-        consolePrinter.printUserDetails(user)
-    }
-    
-    private func updateProfile() {
-        ProfileUpdateFlow.handleProfileUpdate(
-            userId: userId,
-            userService: userService,
-            consolePrinter: consolePrinter
-        )
     }
 }
 

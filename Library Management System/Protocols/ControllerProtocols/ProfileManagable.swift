@@ -1,20 +1,30 @@
 import Foundation
 
-struct ProfileUpdateFlow {
+protocol ProfileManageable {
+   var userId: UUID { get }
+    var userService: UserService { get }
+    var consolePrinter: ConsolePrinter { get }
+}
 
-    static func handleProfileUpdate(
-        userId: UUID,
-        userService: UserService,
-        consolePrinter: ConsolePrinter
-    ) {
-
+extension ProfileManageable {
+    
+    func viewProfile() {
+        guard let user = userService.getUserById(userId) else {
+            consolePrinter.showError("Unable to load profile.")
+            return
+        }
+        consolePrinter.printUserDetails(user)
+    }
+    
+    func updateProfile() {
+        
         guard let user = userService.getUserById(userId) else {
             consolePrinter.showError("User not found.")
             return
         }
 
         consolePrinter.printUserDetails(user)
-
+        
         let updatedUser = consolePrinter.readUpdateUser(user)
         let result = userService.updateProfile(updatedUser)
 
@@ -28,4 +38,3 @@ struct ProfileUpdateFlow {
         }
     }
 }
-

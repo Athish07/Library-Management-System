@@ -1,30 +1,30 @@
 import Foundation
 
-struct ProfileFlowHelper {
+struct ProfileUpdateFlow {
 
     static func handleProfileUpdate(
         userId: UUID,
         userService: UserService,
-        view: ConsoleView
+        consolePrinter: ConsolePrinter
     ) {
 
         guard let user = userService.getUserById(userId) else {
-            view.showError("User not found.")
+            consolePrinter.showError("User not found.")
             return
         }
 
-        view.printUserDetails(user)
+        consolePrinter.printUserDetails(user)
 
-        let updatedUser = view.readUpdateUser(user)
+        let updatedUser = consolePrinter.readUpdateUser(user)
         let result = userService.updateProfile(updatedUser)
 
         switch result {
         case .success:
             print("Profile updated successfully.")
         case .noChanges:
-            view.showError("No changes detected.")
+            consolePrinter.showError("No changes detected.")
         case .userNotFound:
-            view.showError("User not found.")
+            consolePrinter.showError("User not found.")
         }
     }
 }

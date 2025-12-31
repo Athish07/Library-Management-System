@@ -1,11 +1,11 @@
 import Foundation
 
 struct InputUtils {
-    
+
     private static func read<T>(
         prompt: String,
         allowCancel: Bool,
-        validation: (String) -> T?
+        validation: (String) -> (T?, String?)
     ) -> T? {
 
         while true {
@@ -18,19 +18,25 @@ struct InputUtils {
             let trimmed = rawInput.trimmingCharacters(
                 in: .whitespacesAndNewlines
             )
-            
+
             if trimmed.isEmpty, allowCancel {
                 return nil
             }
-            
-            if let value = validation(trimmed) {
+
+            let (value, errorMessage) = validation(trimmed)
+
+            if let value = value {
                 return value
             }
 
-            print("Invalid input. Please try again.\n")
+            if let error = errorMessage {
+                print("\n\(error)\n")
+            } else {
+                print("Invalid input. Please try again.\n")
+            }
         }
     }
-    
+
     static func readInt(
         _ prompt: String,
         allowCancel: Bool = true
@@ -38,7 +44,12 @@ struct InputUtils {
         read(
             prompt: prompt,
             allowCancel: allowCancel,
-            validation: { Int($0) }
+            validation: { input in
+                if let int = Int(input) {
+                    return (int, nil)
+                }
+                return (nil, "Please enter a valid number.")
+            }
         )
     }
 
@@ -50,11 +61,14 @@ struct InputUtils {
             prompt: prompt,
             allowCancel: allowEmpty,
             validation: { input in
-                allowEmpty || !input.isEmpty ? input : nil
+                if allowEmpty || !input.isEmpty {
+                    return (input, nil)
+                }
+                return (nil, "This field cannot be empty.")
             }
         ) ?? ""
     }
-    
+
     static func readEmail(
         _ prompt: String,
         allowEmpty: Bool = false
@@ -63,11 +77,14 @@ struct InputUtils {
             prompt: prompt,
             allowCancel: allowEmpty,
             validation: { input in
-                input.isValidEmail ? input : nil
+                switch input.emailValidation {
+                case .valid: return (input, nil)
+                case .invalid(let reason): return (nil, reason)
+                }
             }
         ) ?? ""
     }
-    
+
     static func readPhoneNumber(
         _ prompt: String,
         allowEmpty: Bool = false
@@ -76,7 +93,12 @@ struct InputUtils {
             prompt: prompt,
             allowCancel: allowEmpty,
             validation: { input in
-                input.isValidPhoneNumber ? input : nil
+                switch input.phoneValidation {
+                case .valid:
+                    return (input, nil)
+                case .invalid(let reason):
+                    return (nil, reason)
+                }
             }
         ) ?? ""
     }
@@ -84,31 +106,16 @@ struct InputUtils {
     static func readPassword(
         _ prompt: String = "Password"
     ) -> String {
-
-        while true {
-            print(prompt, terminator: ": ")
-
-            let input = String(cString: getpass(""))
-            print()
-
-            let trimmed = input.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
-
-            if trimmed.isValidPassword {
-                return trimmed
+        read(prompt: prompt, allowCancel: false) { input in
+            switch input.passwordValidation {
+            case .valid:
+                return (input, nil)
+            case .invalid(let reason):
+                return (nil, reason)
             }
-
-            print("""
-            Password must contain:
-             -> At least 8 characters
-             -> One uppercase letter
-             -> One lowercase letter
-             -> One number
-            """)
-        }
+        } ?? ""
     }
-    
+
     static func readMenuChoice<T: CaseIterable & RawRepresentable>(
         from options: [T],
         prompt: String = "Enter your choice"
@@ -129,4 +136,3 @@ struct InputUtils {
         }
     }
 }
-

@@ -11,7 +11,7 @@ struct User: Equatable {
     let role: Role
     
     enum Role: String, CaseIterable {
-        case user = "User"
+        case customer = "Customer"
         case librarian = "Librarian"
         
     }

@@ -20,7 +20,6 @@ protocol LibraryService {
     func getAllIssuedBooks() -> [IssuedBook]
     func approveBorrowRequest(requestId: UUID, dueInDays: Int) throws
     func rejectBorrowRequest(requestId: UUID) throws
-    func seedBookData()
 }
 
 extension LibraryService {

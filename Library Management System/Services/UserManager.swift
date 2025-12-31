@@ -8,7 +8,7 @@ final class UserManager: UserService {
         self.userRepository = userRepository
     }
 
-    func updateProfile(_ updatedUser: User) -> ProfileUpdateResult {
+    func updateProfile(_ updatedUser: User) -> UpdateProfileResult {
 
         guard let existingUser = userRepository.findById(updatedUser.userId)
         else {

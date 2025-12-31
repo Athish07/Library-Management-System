@@ -4,13 +4,15 @@ final class AppController {
     private let authenticationService: AuthenticationService
     private let libraryService: LibraryService
     private let userService: UserService
-    private let consoleView: ConsoleView
+    private let reportService: ReportService
+    private let consolPrinter: ConsolePrinter
     
-    init(authenticationService: AuthenticationService, libraryService: LibraryService, userService: UserService, consoleView: ConsoleView) {
+    init(authenticationService: AuthenticationService, libraryService: LibraryService, userService: UserService, consolePrinter: ConsolePrinter, reportService: ReportService) {
         self.authenticationService = authenticationService
         self.libraryService = libraryService
         self.userService = userService
-        self.consoleView = consoleView
+        self.reportService = reportService
+        self.consolPrinter = consolePrinter
     }
     
     func start() {
@@ -20,10 +22,10 @@ final class AppController {
     }
     
     private func showPublicMenu() {
-        consoleView.showMenu(PublicMenu.allCases, title: "LIBRARY MANAGEMENT SYSTEM")
+        consolPrinter.showMenu(PublicMenu.allCases, title: "LIBRARY MANAGEMENT SYSTEM")
         
         guard let choice = InputUtils.readMenuChoice(from: PublicMenu.allCases) else {
-            consoleView.showError("Invalid choice")
+            consolPrinter.showError("Invalid choice")
             return
         }
         
@@ -39,7 +41,7 @@ final class AppController {
     }
     
     private func showLoginRoleMenu() {
-        consoleView.showMenu(UserRole.allCases, title: "Login As")
+        consolPrinter.showMenu(UserRole.allCases, title: "Login As")
         
         guard let choice = InputUtils.readMenuChoice(from: UserRole.allCases, prompt: "Enter your choice(press ENTER to move back)") else {
             return
@@ -48,8 +50,8 @@ final class AppController {
         switch choice {
         case .librarian:
             login(as: .librarian)
-        case .user:
-            login(as: .user)
+        case .customer:
+            login(as: .customer)
         }
     }
     
@@ -63,7 +65,7 @@ final class AppController {
             let user = try authenticationService.login(email: email, password: password)
             
             guard user.role == role else {
-                consoleView.showError("You don't have permission to login as \(role.rawValue).")
+                consolPrinter.showError("You don't have permission to login as \(role.rawValue).")
                 
                 return
             }
@@ -77,20 +79,21 @@ final class AppController {
                             currentUserId: user.userId,
                             libraryService: libraryService,
                             userService: userService,
-                            consoleView: consoleView
+                            reportService: reportService,
+                            consolePrinter: consolPrinter
                         ).start()
 
-                    case .user:
+                    case .customer:
                         UserController(
                             currentUserId: user.userId,
                             libraryService: libraryService,
                             userService: userService,
-                            consoleView: consoleView
+                            consolePrinter: consolPrinter
                         ).start()
                     }
             
         } catch {
-            consoleView.showError("Login failed: \(error.localizedDescription)")
+            consolPrinter.showError(error.localizedDescription)
            
         }
     }
@@ -105,7 +108,7 @@ final class AppController {
         let confirm = InputUtils.readPassword("Confirm password")
         
         guard password == confirm else {
-            consoleView.showError("Passwords do not match.")
+            consolPrinter.showError("Passwords do not match.")
             return
         }
         
@@ -119,13 +122,13 @@ final class AppController {
                 password: password,
                 phoneNumber: phone,
                 address: address,
-                role: .user  
+                role: .customer  
             )
             
             print("Registration successful!\nYou can now login with your credentials.")
             
         } catch {
-            consoleView.showError("Registration failed: \(error.localizedDescription)")
+            consolPrinter.showError(error.localizedDescription)
         }
     }
 }

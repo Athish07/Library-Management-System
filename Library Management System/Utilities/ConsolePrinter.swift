@@ -1,6 +1,6 @@
 import Foundation
 
-final class ConsoleView {
+final class ConsolePrinter {
 
     func showMenu<T: CaseIterable & RawRepresentable>(
         _ options: [T],
@@ -24,6 +24,7 @@ final class ConsoleView {
         print("Author: \(book.author)")
         print("Category: \(book.category.rawValue)")
         print("Available: \(book.availableCopies)/\(book.totalCopies)")
+        print(String(repeating:"==",count: 10))
     }
 
     func printUserDetails(_ user: User) {

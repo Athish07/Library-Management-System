@@ -5,25 +5,28 @@ final class LibrarianController {
     private let userId: UUID
     private let libraryService: LibraryService
     private let userService: UserService
-    private let consoleView: ConsoleView
+    private let reportService: ReportService
+    private let consolePrinter: ConsolePrinter
     
     init(
         currentUserId: UUID,
         libraryService: LibraryService,
         userService: UserService,
-        consoleView: ConsoleView
+        reportService: ReportService,
+        consolePrinter: ConsolePrinter
     ) {
         self.userId = currentUserId
         self.libraryService = libraryService
         self.userService = userService
-        self.consoleView = consoleView
+        self.reportService = reportService
+        self.consolePrinter = consolePrinter
     }
     
     func start() {
         print("Librarian Mode")
         
         while true {
-            consoleView.showMenu(
+            consolePrinter.showMenu(
                 MenuOption.allCases,
                 title: "LIBRARIAN MENU"
             )
@@ -33,7 +36,7 @@ final class LibrarianController {
                     from: MenuOption.allCases
                 )
             else {
-                consoleView.showError("Invalid choice")
+                consolePrinter.showError("Invalid choice")
                 continue
             }
             
@@ -46,6 +49,8 @@ final class LibrarianController {
                 viewAndManagePendingRequests()
             case .viewAllIssuedBooks:
                 viewAllIssuedBooks()
+            case .viewIssuedBookHistory: viewIssuedBookHistory()
+            case .viewOverDuedBooks: viewOverDuedBooks()
             case .viewProfile: viewProfile()
             case .updateProfile: updateProfile()
             case .logout:
@@ -62,7 +67,7 @@ final class LibrarianController {
         let title = InputUtils.readString("Enter book title")
         let author = InputUtils.readString("Enter author name")
         
-        consoleView
+        consolePrinter
             .showMenu(BookCategory.allCases, title: "Available categories.")
         
         guard
@@ -73,14 +78,14 @@ final class LibrarianController {
         else {
             return
         }
-       
+        
         guard
             let copies = InputUtils.readInt(
                 "Enter number of copies",
                 allowCancel: false
             ), copies > 0
         else {
-            consoleView.showError("Number of copies must be greater than 0")
+            consolePrinter.showError("Number of copies must be greater than 0")
             return
         }
         
@@ -93,7 +98,7 @@ final class LibrarianController {
             )
             print("Book '\(title)' added successfully with \(copies) copies!")
         } catch {
-            consoleView.showError(
+            consolePrinter.showError(
                 "Failed to add book: \(error.localizedDescription)"
             )
         }
@@ -109,7 +114,7 @@ final class LibrarianController {
         print("All books in the library:")
         
         for book in books {
-            consoleView.printBookDetails(book)
+            consolePrinter.printBookDetails(book)
         }
         
         guard
@@ -128,7 +133,7 @@ final class LibrarianController {
             try libraryService.removeBook(bookId: book.bookId)
             print("Book '\(book.title)' removed successfully.")
         } catch {
-            consoleView.showError(
+            consolePrinter.showError(
                 "Failed to remove book: \(error.localizedDescription)"
             )
         }
@@ -150,15 +155,15 @@ final class LibrarianController {
                 let book = try libraryService.getBook(bookId: request.bookId)
                 
                 print("\(index + 1).")
-                consoleView.printBookDetails(book)
+                consolePrinter.printBookDetails(book)
                 
-                print("Request Date: \(request.requestDate.formattedMediumDateTime())")
+                print("Request Date: \(request.requestDate.formattedMediumDateTime)")
                 print(
-                    "Requested By: \(userService.getUserById(userId)?.name ?? "Unknown")"
+                    "Requested By: \(userService.getUserById(request.userId)?.name ?? "Unknown")"
                 )
                 print("---")
             } catch {
-                consoleView.showError("Book not found")
+                consolePrinter.showError("Book not found")
             }
         }
         
@@ -173,12 +178,9 @@ final class LibrarianController {
         
         let selected = requests[choice - 1]
         
-        consoleView.showMenu(
+        consolePrinter.showMenu(
             BorrowRequestAction.allCases,
             title: "Manage Borrow Request"
-        )
-        print(
-            "Manage Request for Book ID: \(selected.bookId.uuidString.prefix(8))..."
         )
         
         guard
@@ -210,6 +212,70 @@ final class LibrarianController {
         
     }
     
+    private func viewIssuedBookHistory() {
+        let books = libraryService.getAllBooks()
+        
+        guard !books.isEmpty else {
+            print("No books available.")
+            return
+        }
+        
+        for (index, book) in books.enumerated() {
+            print("\(index + 1). \(book.title)")
+        }
+        
+        guard
+            let index = InputUtils.readInt(
+                "Select book number (Press Enter to cancel)",
+                allowCancel: true
+            ), (1...books.count).contains(index)
+        else { return }
+        
+        do {
+            let history = try reportService.getIssuedBookHistory(
+                bookId: books[index - 1].bookId
+            )
+            
+            if history.isEmpty {
+                print("No history found for this book.")
+                return
+            }
+            
+            for record in history {
+                print(
+                    """
+                    Book: \(record.bookTitle)
+                    Author: \(record.author)
+                    Borrowed By: \(record.userName)
+                    Email: \(record.email)
+                    ---
+                    """
+                )
+            }
+        } catch {
+            consolePrinter.showError(error.localizedDescription)
+        }
+    }
+    
+    private func viewOverDuedBooks() {
+        let overdue = reportService.getOverDueBooks()
+        
+        guard !overdue.isEmpty else {
+            print("No overdue books.")
+            return
+        }
+        
+        for item in overdue {
+            print("""
+               Book: \(item.bookTitle)
+               Author: \(item.author)
+               User: \(item.userName)
+               Days Overdue: \(item.daysOverdue)
+               ---
+               """)
+        }
+    }
+    
     private func viewAllIssuedBooks() {
         let issued = libraryService.getAllIssuedBooks()
         
@@ -224,7 +290,7 @@ final class LibrarianController {
                     )
                     showBorrowedBook(book, issuedBook)
                 } catch {
-                    consoleView.showError("Book not found")
+                    consolePrinter.showError("Book not found")
                 }
             }
         }
@@ -236,14 +302,14 @@ final class LibrarianController {
             return
         }
         
-        consoleView.printUserDetails(user)
+        consolePrinter.printUserDetails(user)
     }
     
     private func updateProfile() {
-        ProfileFlowHelper.handleProfileUpdate(
+        ProfileUpdateFlow.handleProfileUpdate(
             userId: userId,
             userService: userService,
-            view: consoleView
+            consolePrinter: consolePrinter
         )
     }
 }
@@ -255,6 +321,8 @@ extension LibrarianController {
         case removeBook = "Remove Book"
         case viewPendingRequests = "View Pending Borrow Requests"
         case viewAllIssuedBooks = "View All Issued Books"
+        case viewIssuedBookHistory = "View Issued Book History"
+        case viewOverDuedBooks = "View Over-Dued Books"
         case viewProfile = "View Profile"
         case updateProfile = "Update Profile"
         case logout = "Logout"

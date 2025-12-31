@@ -1,3 +1,5 @@
+import Foundation
+
 protocol AuthenticationService {
     func login(email: String, password: String) throws -> User
     func register(
@@ -8,6 +10,5 @@ protocol AuthenticationService {
         address: String,
         role: UserRole
     ) throws
-    func seedDemoDetails(userRepository: any UserRepository)
 }
 

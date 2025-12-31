@@ -40,13 +40,13 @@ struct Book {
 }
 
 extension Book {
-
+    
     mutating func issueCopy() -> Bool {
         guard availableCopies > 0 else { return false }
         availableCopies -= 1
         return true
     }
-
+    
     mutating func returnCopy() {
         guard availableCopies < totalCopies else { return }
         availableCopies += 1

@@ -1,5 +1,22 @@
-import CryptoKit
 import Foundation
+
+enum AuthenticationError: Error, LocalizedError {
+
+    case userNotFound
+    case invalidPassword
+    case userAlreadyExists
+
+    var errorDescription: String? {
+        switch self {
+        case .userNotFound:
+            return "No user found with this email."
+        case .invalidPassword:
+            return "Incorrect Password."
+        case .userAlreadyExists:
+            return "Account with this email already exists"
+        }
+    }
+}
 
 final class AuthenticationManager: AuthenticationService {
 
@@ -14,10 +31,8 @@ final class AuthenticationManager: AuthenticationService {
         guard let user = userRepository.findByEmail(email) else {
             throw AuthenticationError.userNotFound
         }
-
-        let hashedPassword = hash(password)
-
-        guard hashedPassword == user.password else {
+        
+        guard password == user.password else {
             throw AuthenticationError.invalidPassword
         }
 
@@ -36,13 +51,11 @@ final class AuthenticationManager: AuthenticationService {
         if userRepository.findByEmail(email) != nil {
             throw AuthenticationError.userAlreadyExists
         }
-
-        let hashedPassword = hash(password)
-
+        
         let user = User(
             name: name,
             email: email,
-            password: hashedPassword,
+            password: password,
             phoneNumber: phoneNumber,
             address: address,
             role: role
@@ -50,64 +63,6 @@ final class AuthenticationManager: AuthenticationService {
 
         userRepository.save(user)
     }
-
-    private func hash(_ password: String) -> String {
-        let data = Data(password.utf8)
-        let digest = SHA256.hash(data: data)
-        return digest.map { String(format: "%02x", $0) }.joined()
-    }
-}
-
-extension AuthenticationManager {
-
-    func seedDemoDetails(userRepository: any UserRepository) {
-
-        if userRepository.findByEmail("athish@gmail.com") == nil {
-            let hashed = hash("Athish_07")
-
-            let librarian = User(
-                name: "Head Librarian",
-                email: "athish@gmail.com",
-                password: hashed,
-                phoneNumber: "8148847642",
-                address: "Main Library Building",
-                role: .librarian
-            )
-
-            userRepository.save(librarian)
-        }
-
-        if userRepository.findByEmail("user@gamil.com") == nil {
-            let hashed = hash("Athish_07")
-
-            let testUser = User(
-                name: "Test User",
-                email: "user@gmail.com",
-                password: hashed,
-                phoneNumber: "7904411578",
-                address: "123 Test Street",
-                role: .user
-            )
-            userRepository.save(testUser)
-        }
-    }
-    
-    enum AuthenticationError: Error {
-
-        case userNotFound
-        case invalidPassword
-        case userAlreadyExists
-
-        var errorDescrxiption: String? {
-            switch self {
-            case .userNotFound:
-                return "No user found with this email."
-            case .invalidPassword:
-                return "InCorrect Password."
-            case .userAlreadyExists:
-                return "Account with this email already exists"
-            }
-        }
-    }
     
 }
+

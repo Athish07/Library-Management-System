@@ -1,7 +1,41 @@
 import Foundation
 
+enum LibraryError: Error, LocalizedError {
+    case bookNotFound
+    case bookUnavailable
+    case duplicateBorrowRequest
+    case issueNotFound
+    case bookAlreadyReturned
+    case invalidReturnDate
+    case invalidCopyCount
+    case bookCurrentlyIssued
+    case requestNotFound
+    case requestNotPending
+
+    var errorDescription: String? {
+        switch self {
+        case .bookNotFound: return "Book not found."
+        case .bookUnavailable: return "Book is not available for borrowing."
+        case .duplicateBorrowRequest:
+            return "You already have a pending request for this book."
+        case .issueNotFound: return "Borrow record not found."
+        case .bookAlreadyReturned:
+            return "This book has already been returned."
+        case .invalidReturnDate:
+            return "Return date cannot be before issue date."
+        case .invalidCopyCount:
+            return "Number of copies must be greater than zero."
+        case .bookCurrentlyIssued:
+            return "Cannot remove book while copies are issued."
+        case .requestNotFound: return "Borrow request not found."
+        case .requestNotPending: return "Request is not pending."
+        }
+    }
+
+}
+
 final class LibraryManager: LibraryService {
-    
+
     private let bookRepository: BookRepository
     private let borrowRequestRepository: BorrowRequestRepository
     private let issuedBookRepository: IssuedBookRepository
@@ -63,9 +97,7 @@ final class LibraryManager: LibraryService {
     }
 
     func getBorrowedBooks(for userId: UUID) -> [IssuedBook] {
-        issuedBookRepository.getIssuedBooks(for: userId)
-            .filter { $0.returnDate == nil }
-            .sorted { $0.dueDate < $1.dueDate }
+        issuedBookRepository.getAllIssuedBooks().filter { $0.userId == userId }
     }
 
     func returnBook(issueId: UUID, on returnDate: Date = Date()) throws
@@ -85,7 +117,7 @@ final class LibraryManager: LibraryService {
 
         var fine: Double = 0.0
         if returnDate > issuedBook.dueDate {
-            
+
             fine = finePerDay * Double(issuedBook.daysOverdue)
         }
         issuedBook.applyFine(fine)
@@ -124,7 +156,7 @@ final class LibraryManager: LibraryService {
             throw LibraryError.bookNotFound
         }
 
-        let activeIssues = issuedBookRepository.getIssuedBooks(for: bookId)
+        let activeIssues = issuedBookRepository.getIssuedBooks(bookId: bookId)
             .contains { $0.returnDate == nil }
         guard !activeIssues else {
             throw LibraryError.bookCurrentlyIssued
@@ -158,7 +190,7 @@ final class LibraryManager: LibraryService {
         guard var request = borrowRequestRepository.findById(requestId) else {
             throw LibraryError.requestNotFound
         }
-        
+
         guard let book = bookRepository.findById(request.bookId),
             book.availableCopies > 0
         else {
@@ -177,6 +209,7 @@ final class LibraryManager: LibraryService {
             value: dueInDays,
             to: issueDate
         )!
+        // i need to confirm this.
 
         let issuedBook = IssuedBook(
             bookId: request.bookId,
@@ -186,11 +219,10 @@ final class LibraryManager: LibraryService {
         )
 
         issuedBookRepository.save(issuedBook)
-        
+
         if request.issue() {
             borrowRequestRepository.save(request)
-        }
-        else {
+        } else {
             throw LibraryError.requestNotPending
         }
     }
@@ -199,104 +231,13 @@ final class LibraryManager: LibraryService {
         guard var request = borrowRequestRepository.findById(requestId) else {
             throw LibraryError.requestNotFound
         }
-        
+
         if request.reject() {
-            borrowRequestRepository.save(request) }
-        else {
+            borrowRequestRepository.save(request)
+        } else {
             throw LibraryError.requestNotPending
         }
     }
+
 }
 
-extension LibraryManager {
-
-    func seedBookData() {
-
-        guard getAllBooks().isEmpty else {
-            return
-        }
-
-        try? addBook(
-            title: "Swift Programming: The Big Nerd Ranch Guide",
-            author: "Mikey Ward",
-            category: .programming,
-            totalCopies: 5
-        )
-
-        try? addBook(
-            title: "Clean Architecture",
-            author: "Robert C. Martin",
-            category: .programming,
-            totalCopies: 3
-        )
-
-        try? addBook(
-            title: "The Pragmatic Programmer",
-            author: "David Thomas",
-            category: .programming,
-            totalCopies: 4
-        )
-
-        try? addBook(
-            title: "1984",
-            author: "George Orwell",
-            category: .fiction,
-            totalCopies: 6
-        )
-
-        try? addBook(
-            title: "To Kill a Mockingbird",
-            author: "Harper Lee",
-            category: .fiction,
-            totalCopies: 4
-        )
-
-        try? addBook(
-            title: "Sapiens",
-            author: "Yuval Noah Harari",
-            category: .history,
-            totalCopies: 3
-        )
-
-        try? addBook(
-            title: "Cosmos",
-            author: "Carl Sagan",
-            category: .science,
-            totalCopies: 2
-        )
-    }
-    
-    enum LibraryError: Error, LocalizedError {
-        case bookNotFound
-        case bookUnavailable
-        case duplicateBorrowRequest
-        case issueNotFound
-        case bookAlreadyReturned
-        case invalidReturnDate
-        case invalidCopyCount
-        case bookCurrentlyIssued
-        case requestNotFound
-        case requestNotPending
-
-        var errorDescription: String? {
-            switch self {
-            case .bookNotFound: return "Book not found."
-            case .bookUnavailable: return "Book is not available for borrowing."
-            case .duplicateBorrowRequest:
-                return "You already have a pending request for this book."
-            case .issueNotFound: return "Borrow record not found."
-            case .bookAlreadyReturned: return "This book has already been returned."
-            case .invalidReturnDate:
-                return "Return date cannot be before issue date."
-            case .invalidCopyCount:
-                return "Number of copies must be greater than zero."
-            case .bookCurrentlyIssued:
-                return "Cannot remove book while copies are issued."
-            case .requestNotFound: return "Borrow request not found."
-            case .requestNotPending: return "Request is not pending."
-            }
-        }
-
-    }
-    
-}

@@ -12,9 +12,9 @@ final class InMemoryIssuedBookRepository: IssuedBookRepository {
         issuedBooks[issueId]
     }
     
-    func getIssuedBooks(for userId: UUID) -> [IssuedBook] {
+    func getIssuedBooks(bookId: UUID) -> [IssuedBook] {
         issuedBooks.values
-            .filter { $0.userId == userId }
+            .filter { $0.bookId == bookId }
             .sorted { $0.issueDate > $1.issueDate }
     }
     

@@ -4,5 +4,6 @@ protocol IssuedBookRepository {
     func save(_ issuedBook: IssuedBook)
     func findById(_ issueId: UUID) -> IssuedBook?
     func getAllIssuedBooks() -> [IssuedBook]
-    func getIssuedBooks(for userId: UUID) -> [IssuedBook]
+    func getIssuedBooks(bookId: UUID) -> [IssuedBook]
+    
 }

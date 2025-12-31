@@ -1,17 +1,5 @@
 import Foundation
 
-enum ReportError: Error, LocalizedError {
-    case bookNotFound
-    case userNotFound
-
-    var errorDescription: String? {
-        switch self {
-        case .bookNotFound: return "Book not found."
-        case .userNotFound: return "User not found."
-        }
-    }
-}
-
 final class ReportManager: ReportService {
 
     private let userRepository: UserRepository
@@ -57,7 +45,7 @@ final class ReportManager: ReportService {
         
     }
 
-    func getOverDueBooks() -> [overDueBookItem] {
+    func getOverdueBooks() -> [overDueBookItem] {
         let issues = issuedBookRepository.getAllIssuedBooks().filter {
             $0.isOverdue
         }
@@ -79,5 +67,20 @@ final class ReportManager: ReportService {
 
     }
 
+}
+
+extension ReportManager {
+    
+    enum ReportError: Error, LocalizedError {
+        case bookNotFound
+        case userNotFound
+
+        var errorDescription: String? {
+            switch self {
+            case .bookNotFound: return "Book not found."
+            case .userNotFound: return "User not found."
+            }
+        }
+    }
 }
 

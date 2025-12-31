@@ -1,12 +1,12 @@
 import Foundation
 
 final class UserController {
-
+    
     private let userId: UUID
     private let libraryService: LibraryService
     private let userService: UserService
     private let consolePrinter: ConsolePrinter
-
+    
     init(
         currentUserId: UUID,
         libraryService: LibraryService,
@@ -18,13 +18,13 @@ final class UserController {
         self.userService = userService
         self.consolePrinter = consolePrinter
     }
-
+    
     func start() {
         print("Welcome to the Library")
-
+        
         while true {
             consolePrinter.showMenu(MenuOption.allCases, title: "USER MENU")
-
+            
             guard
                 let choice = InputUtils.readMenuChoice(
                     from: MenuOption.allCases
@@ -33,7 +33,7 @@ final class UserController {
                 consolePrinter.showError("Invalid choice")
                 continue
             }
-
+            
             switch choice {
             case .searchBooks: searchBooks()
             case .viewAvailableBooks: viewAvailableBooks()
@@ -48,15 +48,15 @@ final class UserController {
             }
         }
     }
-
+    
     private func searchBooks() {
-
+        
         let query = InputUtils.readString(
             "Enter search term (title/author/category)"
         )
-
+        
         let results = libraryService.search(by: query)
-
+        
         if results.isEmpty {
             print(" No books found matching '\(query)'.")
         } else {
@@ -66,16 +66,16 @@ final class UserController {
             }
         }
     }
-
+    
     private func viewProfile() {
-
+        
         guard let user = userService.getUserById(userId) else {
             return
         }
-
+        
         consolePrinter.printUserDetails(user)
     }
-
+    
     private func updateProfile() {
         ProfileUpdateFlow.handleProfileUpdate(
             userId: userId,
@@ -83,11 +83,11 @@ final class UserController {
             consolePrinter: consolePrinter
         )
     }
-
+    
     private func viewAvailableBooks() {
-
+        
         let books = libraryService.getAvailableBooks()
-
+        
         if books.isEmpty {
             print(" No books are currently available.")
         } else {
@@ -97,16 +97,16 @@ final class UserController {
             }
         }
     }
-
+    
     private func viewMyBorrowedBooks() {
-
+        
         let borrowed = libraryService.getBorrowedBooks(for: userId)
-
+        
         if borrowed.isEmpty {
             print("You have no borrowed books.")
         } else {
             print("Your Borrowed Books (\(borrowed.count)):")
-
+            
             for issued in borrowed {
                 do {
                     let book = try libraryService.getBook(bookId: issued.bookId)
@@ -115,20 +115,20 @@ final class UserController {
                     print("   Due: \(issued.dueDate.formattedMediumDateTime)")
                     if issued.isOverdue {
                         let days = issued.daysOverdue
-                        print("OVERDUE by \(days) day(s) - Fine: $\(days).00")
+                        print("OVERDUE by \(days) day(s)")
                     }
-                    print("---")
+                    print(String(repeating:"===",count: 10))
                 } catch {
                     consolePrinter.showError(error.localizedDescription)
                 }
             }
         }
-
+        
     }
-
+    
     private func requestBorrowBook() {
         let books = libraryService.getAvailableBooks()
-
+        
         if books.isEmpty {
             print("No books available to borrow right now.")
             return
@@ -139,7 +139,7 @@ final class UserController {
             print("\(index + 1). ", terminator: "")
             consolePrinter.printBookDetails(book)
         }
-
+        
         guard
             let index = InputUtils.readInt(
                 "Enter book number to request (or press Enter to cancel)",
@@ -149,9 +149,9 @@ final class UserController {
             print("Borrow request cancelled.")
             return
         }
-
+        
         let selectedBook = books[index - 1]
-
+        
         do {
             try libraryService.requestBorrow(
                 bookId: selectedBook.bookId,
@@ -164,30 +164,30 @@ final class UserController {
             consolePrinter.showError(error.localizedDescription)
         }
     }
-
+    
     private func returnBook() {
         
         let borrowed = libraryService.getBorrowedBooks(for: userId)
-
+        
         if borrowed.isEmpty {
             print("You have no books to return.")
             return
         }
-
+        
         print("Your Borrowed Books:")
-
+        
         for (index, issued) in borrowed.enumerated() {
             do {
                 let book = try libraryService.getBook(bookId: issued.bookId)
-               
+                
                 print("\(index + 1). ", terminator: "")
                 consolePrinter.printBookDetails(book)
-            
+                
                 print(
                     " Due: \(issued.dueDate.formattedMediumDateTime) \(issued.isOverdue ? "OVERDUE" : "")"
                 )
             } catch {
-                print(error.localizedDescription)
+                consolePrinter.showError(error.localizedDescription)
             }
         }
         
@@ -200,12 +200,12 @@ final class UserController {
             print("Return cancelled.")
             return
         }
-
         let selected = borrowed[index - 1]
-
+        
         do {
             let fine = try libraryService.returnBook(
-                issueId: selected.issueId
+                issueId: selected.issueId,
+                on: Date()
             )
             if fine > 0 {
                 print(
@@ -217,12 +217,12 @@ final class UserController {
         } catch {
             consolePrinter.showError(error.localizedDescription)
         }
-
+        
     }
 }
 
 extension UserController {
-
+    
     enum MenuOption: String, CaseIterable {
         case searchBooks = "Search Books"
         case viewAvailableBooks = "View All Available Books"
@@ -233,5 +233,5 @@ extension UserController {
         case updateProfile = "Update Profile"
         case logout = "Logout"
     }
-
+    
 }

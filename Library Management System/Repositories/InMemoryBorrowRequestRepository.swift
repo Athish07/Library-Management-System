@@ -16,11 +16,6 @@ final class InMemoryBorrowRequestRepository: BorrowRequestRepository {
         Array(requests.values)
             .sorted { $0.requestDate < $1.requestDate }
     }
-    
-    func getPendingRequests() -> [BorrowRequest] {
-        requests.values
-            .filter { $0.status == .pending }
-            .sorted { $0.requestDate < $1.requestDate }
-    }
+
     
 }

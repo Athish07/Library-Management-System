@@ -7,6 +7,7 @@ final class LibrarianController {
     private let userService: UserService
     private let reportService: ReportService
     private let consolePrinter: ConsolePrinter
+    private let defaultBorrowPeriod: Int = 14
     
     init(
         currentUserId: UUID,
@@ -50,7 +51,7 @@ final class LibrarianController {
             case .viewAllIssuedBooks:
                 viewAllIssuedBooks()
             case .viewIssuedBookHistory: viewIssuedBookHistory()
-            case .viewOverDuedBooks: viewOverDuedBooks()
+            case .viewOverdueBooks: viewOverdueBooks()
             case .viewProfile: viewProfile()
             case .updateProfile: updateProfile()
             case .logout:
@@ -98,12 +99,10 @@ final class LibrarianController {
             )
             print("Book '\(title)' added successfully with \(copies) copies!")
         } catch {
-            consolePrinter.showError(
-                "Failed to add book: \(error.localizedDescription)"
-            )
+            consolePrinter.showError(error.localizedDescription)
         }
     }
-    
+
     private func removeBook() {
         let books = libraryService.getAllBooks()
         
@@ -113,7 +112,8 @@ final class LibrarianController {
         }
         print("All books in the library:")
         
-        for book in books {
+        for (index,book) in books.enumerated() {
+            print("\(index + 1).",terminator: "")
             consolePrinter.printBookDetails(book)
         }
         
@@ -133,9 +133,7 @@ final class LibrarianController {
             try libraryService.removeBook(bookId: book.bookId)
             print("Book '\(book.title)' removed successfully.")
         } catch {
-            consolePrinter.showError(
-                "Failed to remove book: \(error.localizedDescription)"
-            )
+            consolePrinter.showError(error.localizedDescription)
         }
     }
     
@@ -163,7 +161,7 @@ final class LibrarianController {
                 )
                 print("---")
             } catch {
-                consolePrinter.showError("Book not found")
+                consolePrinter.showError(error.localizedDescription)
             }
         }
         
@@ -196,7 +194,8 @@ final class LibrarianController {
             switch action {
             case .issue:
                 try libraryService.approveBorrowRequest(
-                    requestId: selected.requestId
+                    requestId: selected.requestId,
+                    dueInDays: defaultBorrowPeriod
                 )
                 print("Request approved and book issued.")
             case .reject:
@@ -257,8 +256,8 @@ final class LibrarianController {
         }
     }
     
-    private func viewOverDuedBooks() {
-        let overdue = reportService.getOverDueBooks()
+    private func viewOverdueBooks() {
+        let overdue = reportService.getOverdueBooks()
         
         guard !overdue.isEmpty else {
             print("No overdue books.")
@@ -288,9 +287,19 @@ final class LibrarianController {
                     let book = try libraryService.getBook(
                         bookId: issuedBook.bookId
                     )
-                    showBorrowedBook(book, issuedBook)
+                    print(
+                        """
+                        Issued Book Details : 
+                        Book Title: \(book.title)
+                        Book Author: \(book.author)
+                        Book Category: \(book.category)
+                        Issued Date : \(issuedBook.issueDate)
+                        Due Date: \(issuedBook.dueDate)
+                        Days OverDued: \(issuedBook.daysOverdue)
+                        """
+                    )
                 } catch {
-                    consolePrinter.showError("Book not found")
+                    consolePrinter.showError(error.localizedDescription)
                 }
             }
         }
@@ -322,7 +331,7 @@ extension LibrarianController {
         case viewPendingRequests = "View Pending Borrow Requests"
         case viewAllIssuedBooks = "View All Issued Books"
         case viewIssuedBookHistory = "View Issued Book History"
-        case viewOverDuedBooks = "View Over-Dued Books"
+        case viewOverdueBooks = "View Over-Dued Books"
         case viewProfile = "View Profile"
         case updateProfile = "Update Profile"
         case logout = "Logout"
@@ -336,20 +345,3 @@ extension LibrarianController {
     
 }
 
-extension LibrarianController {
-    
-    func showBorrowedBook(_ book: Book, _ issued: IssuedBook) {
-        print(
-            """
-            Issued Book Details : 
-            Book Title: \(book.title)
-            Book Author: \(book.author)
-            Book Category: \(book.category)
-            Issued Date : \(issued.issueDate)
-            Due Date: \(issued.dueDate)
-            Days OverDued: \(issued.daysOverdue)
-            """
-        )
-    }
-    
-}

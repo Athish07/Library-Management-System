@@ -48,7 +48,7 @@ struct InputUtils {
                 if let int = Int(input) {
                     return (int, nil)
                 }
-                return (nil, "Please enter a valid number.")
+                return (nil,"Please enter a valid number.")
             }
         )
     }
@@ -68,7 +68,7 @@ struct InputUtils {
             }
         ) ?? ""
     }
-
+    
     static func readEmail(
         _ prompt: String,
         allowEmpty: Bool = false
@@ -104,7 +104,7 @@ struct InputUtils {
     }
     
     static func readPassword(
-        _ prompt: String = "Password"
+        _ prompt: String
     ) -> String {
         read(prompt: prompt, allowCancel: false) { input in
             switch input.passwordValidation {
@@ -116,7 +116,7 @@ struct InputUtils {
         } ?? ""
     }
 
-    static func readMenuChoice<T: CaseIterable & RawRepresentable>(
+    static func readMenuChoice<T>(
         from options: [T],
         prompt: String = "Enter your choice"
     ) -> T? {

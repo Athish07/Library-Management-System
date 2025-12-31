@@ -21,16 +21,3 @@ protocol LibraryService {
     func approveBorrowRequest(requestId: UUID, dueInDays: Int) throws
     func rejectBorrowRequest(requestId: UUID) throws
 }
-
-extension LibraryService {
-    func returnBook(issueId: UUID) throws -> Double {
-        try returnBook(issueId: issueId, on: Date())
-    }
-
-    func approveBorrowRequest(requestId: UUID) throws {
-        try approveBorrowRequest(
-            requestId: requestId,
-            dueInDays: 14
-        )
-    }
-}

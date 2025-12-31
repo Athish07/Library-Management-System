@@ -15,6 +15,8 @@ final class UserManager: UserService {
             return .userNotFound
         }
         
+        //i need to chage this as well.
+        
         let mergedUser = User(
             userId: existingUser.userId,
             name: updatedUser.name.isEmpty
@@ -47,8 +49,7 @@ final class UserManager: UserService {
         userRepository.save(mergedUser)
         return .success
     }
-
-
+    
     func getUserById(_ userId: UUID) -> User? {
         userRepository.findById(userId)
     }

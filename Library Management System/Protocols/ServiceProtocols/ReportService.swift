@@ -16,5 +16,5 @@ typealias overDueBookItem = (
 
 protocol ReportService {
     func getIssuedBookHistory(bookId: UUID) throws -> [IssuedBookHistory]
-    func getOverDueBooks() -> [overDueBookItem]
+    func getOverdueBooks() -> [overDueBookItem]
 }

@@ -31,7 +31,7 @@ extension IssuedBook {
         returnDate = date
         return true
     }
-
+    
     mutating func applyFine(_ amount: Double) {
         fineAmount = max(0, amount)
     }

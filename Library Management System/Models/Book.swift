@@ -2,10 +2,11 @@ import Foundation
 
 struct Book {
     let bookId: UUID
-    var title: String
-    var author: String
-    var category: Category
+    let title: String
+    let author: String
+    let category: Category
     let totalCopies: Int
+    
     private(set) var availableCopies: Int
     
      enum Category: String, CaseIterable {

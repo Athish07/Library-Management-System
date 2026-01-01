@@ -1,12 +1,12 @@
 import Foundation
 
-protocol ProfileManageable {
+protocol ProfileManagable {
    var userId: UUID { get }
-    var userService: UserService { get }
-    var consolePrinter: ConsolePrinter { get }
+   var userService: UserService { get }
+   var consolePrinter: ConsolePrinter { get }
 }
 
-extension ProfileManageable {
+extension ProfileManagable {
     
     func viewProfile() {
         guard let user = userService.getUserById(userId) else {

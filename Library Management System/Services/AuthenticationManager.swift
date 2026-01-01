@@ -31,7 +31,6 @@ final class AuthenticationManager: AuthenticationService {
         password: String,
         phoneNumber: String,
         address: String,
-        role: UserRole
     ) throws {
 
         if userRepository.findByEmail(email) != nil {
@@ -44,7 +43,7 @@ final class AuthenticationManager: AuthenticationService {
             password: password,
             phoneNumber: phoneNumber,
             address: address,
-            role: role
+            role: .customer
         )
 
         userRepository.save(user)

@@ -1,7 +1,6 @@
 import Foundation
 
-final class UserController: ProfileManageable {
-    
+final class UserController: ProfileManagable {
      let userId: UUID
      let userService: UserService
      let consolePrinter: ConsolePrinter
@@ -20,14 +19,13 @@ final class UserController: ProfileManageable {
     }
     
     func start() {
-        print("Welcome to the Library")
         
         while true {
-            consolePrinter.showMenu(MenuOption.allCases, title: "USER MENU")
+            consolePrinter.showMenu(UserMenuOption.allCases, title: "USER MENU")
             
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: MenuOption.allCases
+                    from: UserMenuOption.allCases
                 )
             else {
                 consolePrinter.showError("Invalid choice")
@@ -206,7 +204,7 @@ final class UserController: ProfileManageable {
 
 extension UserController {
     
-    enum MenuOption: String, CaseIterable {
+    enum UserMenuOption: String, CaseIterable {
         case searchBooks = "Search Books"
         case viewAvailableBooks = "View All Available Books"
         case viewMyBorrowedBooks = "View My Borrowed Books"

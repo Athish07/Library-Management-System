@@ -1,6 +1,6 @@
 import Foundation
 
-final class LibrarianController: ProfileManageable {
+final class LibrarianController: ProfileManagable {
     
     let userId: UUID
     let userService: UserService
@@ -25,17 +25,16 @@ final class LibrarianController: ProfileManageable {
     }
     
     func start() {
-        print("Librarian Mode")
         
         while true {
             consolePrinter.showMenu(
-                MenuOption.allCases,
+                LibrarianMenuOption.allCases,
                 title: "LIBRARIAN MENU"
             )
             
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: MenuOption.allCases
+                    from: LibrarianMenuOption.allCases
                 )
             else {
                 consolePrinter.showError("Invalid choice")
@@ -309,7 +308,7 @@ final class LibrarianController: ProfileManageable {
 
 extension LibrarianController {
     
-    enum MenuOption: String, CaseIterable {
+    enum LibrarianMenuOption: String, CaseIterable {
         case addBook = "Add New Book"
         case removeBook = "Remove Book"
         case viewPendingRequests = "View Pending Borrow Requests"
@@ -319,7 +318,6 @@ extension LibrarianController {
         case viewProfile = "View Profile"
         case updateProfile = "Update Profile"
         case logout = "Logout"
-        
     }
     
     enum BorrowRequestAction: String, CaseIterable {

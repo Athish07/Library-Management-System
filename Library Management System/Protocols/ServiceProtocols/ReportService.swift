@@ -1,20 +1,20 @@
 import Foundation
 
-typealias IssuedBookHistory = (
-    bookTitle: String,
-    author: String,
-    userName: String,
-    email: String
-)
+struct IssuedBookHistory {
+    let bookTitle: String
+    let author: String
+    let userName: String
+    let email: String
+}
 
-typealias overDueBookItem = (
-    bookTitle: String,
-    author: String,
-    userName: String,
-    daysOverdue: Int
-)
+struct OverdueBookItem {
+    let bookTitle: String
+    let author: String
+    let userName: String
+    let daysOverdue: Int
+}
 
 protocol ReportService {
     func getIssuedBookHistory(bookId: UUID) throws -> [IssuedBookHistory]
-    func getOverdueBooks() -> [overDueBookItem]
+    func getOverdueBooks() -> [OverdueBookItem]
 }

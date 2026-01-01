@@ -7,8 +7,7 @@ protocol AuthenticationService {
         email: String,
         password: String,
         phoneNumber: String,
-        address: String,
-        role: UserRole
+        address: String
     ) throws
 }
 

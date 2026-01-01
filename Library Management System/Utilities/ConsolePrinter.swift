@@ -5,15 +5,17 @@ final class ConsolePrinter {
     func showMenu<T: CaseIterable & RawRepresentable>(
         _ options: [T],
         title: String
-    ) {
+    ) where T.RawValue == String {
         
         print("=== \(title) ===\n")
-
+        
         for (index, option) in options.enumerated() {
             print("\(index + 1). \(option.rawValue)")
         }
+        
+        print("")
     }
-
+    
     func showError(_ message: String) {
         print("\nERROR:\(message)\n")
     }

@@ -5,11 +5,11 @@ struct Book {
     let title: String
     let author: String
     let category: Category
-    
+
     private(set) var totalCopies: Int
     private(set) var availableCopies: Int
-    
-     enum Category: String, CaseIterable {
+
+    enum Category: String, CaseIterable {
         case fiction = "Fiction"
         case nonFiction = "Non-Fiction"
         case science = "Science"
@@ -17,7 +17,7 @@ struct Book {
         case history = "History"
         case programming = "Programming"
         case other = "Other"
-        
+
     }
 
     init(
@@ -34,26 +34,23 @@ struct Book {
         self.totalCopies = totalCopies
         self.availableCopies = totalCopies
     }
-    
-    
-
 
 }
 
 extension Book {
-    
+
     mutating func addCopies(_ count: Int) {
-            guard count > 0 else { return }
-            totalCopies += count
-            availableCopies += count
-        }
-    
+        guard count > 0 else { return }
+        totalCopies += count
+        availableCopies += count
+    }
+
     mutating func issueCopy() -> Bool {
         guard availableCopies > 0 else { return false }
         availableCopies -= 1
         return true
     }
-    
+
     mutating func returnCopy() {
         guard availableCopies < totalCopies else { return }
         availableCopies += 1
@@ -61,4 +58,3 @@ extension Book {
 }
 
 typealias BookCategory = Book.Category
-

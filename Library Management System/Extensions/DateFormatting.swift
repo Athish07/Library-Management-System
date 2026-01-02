@@ -2,7 +2,7 @@ import Foundation
 
 extension Date {
 
-   var formattedMediumDateTime: String {
+    var formattedMediumDateTime: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short

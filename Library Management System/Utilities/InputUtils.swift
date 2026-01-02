@@ -48,7 +48,7 @@ struct InputUtils {
                 if let int = Int(input) {
                     return (int, nil)
                 }
-                return (nil,"Please enter a valid number.")
+                return (nil, "Please enter a valid number.")
             }
         )
     }
@@ -68,7 +68,7 @@ struct InputUtils {
             }
         ) ?? ""
     }
-    
+
     static func readEmail(
         _ prompt: String,
         allowEmpty: Bool = false
@@ -102,7 +102,7 @@ struct InputUtils {
             }
         ) ?? ""
     }
-    
+
     static func readPassword(
         _ prompt: String
     ) -> String {
@@ -124,7 +124,7 @@ struct InputUtils {
         let max = options.count
 
         while true {
-            
+
             guard let index = readInt(prompt, allowCancel: true) else {
                 return nil
             }

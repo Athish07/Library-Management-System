@@ -31,18 +31,18 @@ extension IssuedBook {
         returnDate = date
         return true
     }
-    
+
     mutating func applyFine(_ amount: Double) {
         fineAmount = max(0, amount)
     }
-    
+
     var isOverdue: Bool {
         returnDate == nil && Date() > dueDate
     }
 
     var daysOverdue: Int {
         guard returnDate == nil else { return 0 }
-        
+
         let days =
             Calendar.current.dateComponents(
                 [.day],
@@ -51,5 +51,5 @@ extension IssuedBook {
             ).day ?? 0
         return max(0, days)
     }
-    
+
 }

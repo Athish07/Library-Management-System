@@ -25,7 +25,7 @@ final class ReportManager: ReportService {
         let issues = issuedBookRepository.getAllIssuedBooks()
             .filter { $0.bookId == bookId }
             .sorted { $0.issueDate < $1.issueDate }
-        
+
         let history = issues.compactMap { issued -> IssuedBookHistory? in
             guard let user = userRepository.findById(issued.userId) else {
                 return nil
@@ -59,14 +59,14 @@ final class ReportManager: ReportService {
                 daysOverdue: issued.daysOverdue
             )
         }
-        
+
         return history
     }
 
 }
 
 extension ReportManager {
-    
+
     enum ReportError: Error, LocalizedError {
         case bookNotFound
         case userNotFound

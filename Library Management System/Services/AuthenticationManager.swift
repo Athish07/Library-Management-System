@@ -13,11 +13,11 @@ final class AuthenticationManager: AuthenticationService {
         guard let user = userRepository.findByEmail(email) else {
             throw AuthenticationError.userNotFound
         }
-        
+
         guard password == user.password else {
             throw AuthenticationError.invalidPassword
         }
-        
+
         guard user.role == role else {
             throw AuthenticationError.unauthorizedAccess
         }
@@ -32,11 +32,11 @@ final class AuthenticationManager: AuthenticationService {
         phoneNumber: String,
         address: String,
     ) throws {
-        
+
         if userRepository.findByEmail(email) != nil {
             throw AuthenticationError.userAlreadyExists
         }
-        
+
         let user = User(
             name: name,
             email: email,
@@ -48,11 +48,11 @@ final class AuthenticationManager: AuthenticationService {
 
         userRepository.save(user)
     }
-    
+
 }
 
 extension AuthenticationManager {
-    
+
     enum AuthenticationError: Error, LocalizedError {
 
         case userNotFound
@@ -73,6 +73,5 @@ extension AuthenticationManager {
             }
         }
     }
-    
-}
 
+}

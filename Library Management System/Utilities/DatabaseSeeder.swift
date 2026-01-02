@@ -14,7 +14,7 @@ struct DatabaseSeeder {
         if userRepository.findByEmail("athish@gmail.com") == nil {
             let librarian = User(
                 name: "Head Librarian",
-                email: "athish@gmail.com",
+                email: "librarian@gmail.com",
                 password: "Athish_07",
                 phoneNumber: "8148847642",
                 address: "Main Library Building",

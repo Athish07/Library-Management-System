@@ -10,4 +10,3 @@ protocol AuthenticationService {
         address: String
     ) throws
 }
-

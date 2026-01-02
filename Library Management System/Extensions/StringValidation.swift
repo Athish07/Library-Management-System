@@ -6,10 +6,10 @@ extension String {
         case valid
         case invalid(reason: String)
     }
-    
-   var emailValidation: ValidationResult {
+
+    var emailValidation: ValidationResult {
         let pattern =
-        #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+            #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
 
         if range(of: pattern, options: .regularExpression) != nil {
             return .valid
@@ -28,7 +28,7 @@ extension String {
 
     var passwordValidation: ValidationResult {
         let pattern =
-        #"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"#
+            #"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"#
 
         if range(of: pattern, options: .regularExpression) != nil {
             return .valid
@@ -36,13 +36,12 @@ extension String {
 
         return .invalid(
             reason: """
-            Password must contain:
-            • At least 8 characters
-            • One uppercase letter
-            • One lowercase letter
-            • One number
-            """
+                Password must contain:
+                • At least 8 characters
+                • One uppercase letter
+                • One lowercase letter
+                • One number
+                """
         )
     }
 }
-

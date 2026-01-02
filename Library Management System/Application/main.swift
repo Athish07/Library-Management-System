@@ -31,5 +31,4 @@ let appController = AppController(
     consolePrinter: consolePrinter,
     reportService: reportService
 )
-
 appController.start()

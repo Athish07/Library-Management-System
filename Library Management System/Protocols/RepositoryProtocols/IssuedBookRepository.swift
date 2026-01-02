@@ -5,5 +5,5 @@ protocol IssuedBookRepository {
     func findById(_ issueId: UUID) -> IssuedBook?
     func getAllIssuedBooks() -> [IssuedBook]
     func getIssuedBooks(bookId: UUID) -> [IssuedBook]
-    
+
 }

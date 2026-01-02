@@ -6,27 +6,26 @@ final class ConsolePrinter {
         _ options: [T],
         title: String
     ) where T.RawValue == String {
-        
+
         print("=== \(title) ===\n")
-        
+
         for (index, option) in options.enumerated() {
             print("\(index + 1). \(option.rawValue)")
         }
-        
+
         print("")
     }
-    
+
     func showError(_ message: String) {
         print("\nERROR:\(message)\n")
     }
-    
-    
+
     func printBookDetails(_ book: Book) {
         print("\(book.title)")
         print("Author: \(book.author)")
         print("Category: \(book.category.rawValue)")
         print("Available: \(book.availableCopies)/\(book.totalCopies)")
-        print(String(repeating:"==",count: 10))
+        print(String(repeating: "==", count: 10))
     }
 
     func printUserDetails(_ user: User) {
@@ -39,7 +38,7 @@ final class ConsolePrinter {
     func readUpdateUser(_ user: User) -> User {
 
         print("\n press ENTER if you want to proceed with the same detail. \n")
-        
+
         let name = InputUtils.readString(
             "Enter Name(current Name \(user.name))",
             allowEmpty: true

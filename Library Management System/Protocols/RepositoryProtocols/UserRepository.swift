@@ -5,6 +5,5 @@ protocol UserRepository {
     func findById(_ userId: UUID) -> User?
     func findByEmail(_ email: String) -> User?
     func findAll() -> [User]
+
 }
-
-

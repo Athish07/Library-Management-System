@@ -1,13 +1,13 @@
 import Foundation
 
 protocol ProfileManagable {
-   var userId: UUID { get }
-   var userService: UserService { get }
-   var consolePrinter: ConsolePrinter { get }
+    var userId: UUID { get }
+    var userService: UserService { get }
+    var consolePrinter: ConsolePrinter { get }
 }
 
 extension ProfileManagable {
-    
+
     func viewProfile() {
         guard let user = userService.getUserById(userId) else {
             consolePrinter.showError("Unable to load profile.")
@@ -15,16 +15,16 @@ extension ProfileManagable {
         }
         consolePrinter.printUserDetails(user)
     }
-    
+
     func updateProfile() {
-        
+
         guard let user = userService.getUserById(userId) else {
             consolePrinter.showError("User not found.")
             return
         }
 
         consolePrinter.printUserDetails(user)
-        
+
         let updatedUser = consolePrinter.readUpdateUser(user)
         let result = userService.updateProfile(updatedUser)
 

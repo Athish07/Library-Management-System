@@ -17,8 +17,7 @@ let libraryService: LibraryService = LibraryManager(
 let reportService: ReportService = ReportManager(
     userRepository: userRepository,
     bookRepository: bookRepository,
-    issuedBookRepository: issuedBookRepository,
-    borrowRequestRepository: borrowrequestRepository
+    issuedBookRepository: issuedBookRepository
 )
 
 let userService = UserManager(userRepository: userRepository)

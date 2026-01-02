@@ -187,7 +187,6 @@ final class LibraryManager: LibraryService {
             throw LibraryError.bookUnavailable
         }
         bookRepository.save(mutableBook)
-
         let issueDate = Date()
 
         guard
@@ -197,7 +196,9 @@ final class LibraryManager: LibraryService {
                 to: issueDate
             )
         else {
-            return
+            fatalError(
+                "Failed to calculate due date."
+            )
         }
 
         let issuedBook = IssuedBook(
@@ -209,7 +210,7 @@ final class LibraryManager: LibraryService {
 
         issuedBookRepository.save(issuedBook)
 
-        if request.issue() {
+        if request.approve() {
             borrowRequestRepository.save(request)
         } else {
             throw LibraryError.requestNotPending

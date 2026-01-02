@@ -11,9 +11,8 @@ struct BorrowRequest {
     
     enum RequestStatus: String {
         case pending = "Pending"
-        case issued = "Issued"
+        case approved = "Approved"
         case rejected = "Rejected"
-        case returned = "Returned"
     }
     
     init(userId: UUID, bookId: UUID) {
@@ -27,9 +26,9 @@ struct BorrowRequest {
 
 extension BorrowRequest {
 
-    mutating func issue() -> Bool {
+    mutating func approve() -> Bool {
         guard status == .pending else { return false }
-        status = .issued
+        status = .approved
         return true
     }
     
@@ -39,11 +38,6 @@ extension BorrowRequest {
         return true
     }
     
-    mutating func markReturned() -> Bool {
-        guard status == .issued else { return false }
-        status = .returned
-        return true
-    }
 }
 
 typealias RequestStatus = BorrowRequest.RequestStatus

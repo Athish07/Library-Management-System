@@ -5,18 +5,15 @@ final class ReportManager: ReportService {
     private let userRepository: UserRepository
     private let bookRepository: BookRepository
     private let issuedBookRepository: IssuedBookRepository
-    private let borrowRequestRepository: BorrowRequestRepository
 
     init(
         userRepository: UserRepository,
         bookRepository: BookRepository,
         issuedBookRepository: IssuedBookRepository,
-        borrowRequestRepository: BorrowRequestRepository
     ) {
         self.userRepository = userRepository
         self.bookRepository = bookRepository
         self.issuedBookRepository = issuedBookRepository
-        self.borrowRequestRepository = borrowRequestRepository
     }
 
     func getIssuedBookHistory(bookId: UUID) throws -> [IssuedBookHistory] {

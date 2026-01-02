@@ -5,8 +5,8 @@ struct Book {
     let title: String
     let author: String
     let category: Category
-    let totalCopies: Int
     
+    private(set) var totalCopies: Int
     private(set) var availableCopies: Int
     
      enum Category: String, CaseIterable {
@@ -41,6 +41,12 @@ struct Book {
 }
 
 extension Book {
+    
+    mutating func addCopies(_ count: Int) {
+            guard count > 0 else { return }
+            totalCopies += count
+            availableCopies += count
+        }
     
     mutating func issueCopy() -> Bool {
         guard availableCopies > 0 else { return false }

@@ -124,6 +124,7 @@ struct InputUtils {
         let max = options.count
 
         while true {
+            
             guard let index = readInt(prompt, allowCancel: true) else {
                 return nil
             }

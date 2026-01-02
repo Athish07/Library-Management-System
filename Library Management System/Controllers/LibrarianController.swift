@@ -28,13 +28,13 @@ final class LibrarianController: ProfileManagable {
         
         while true {
             consolePrinter.showMenu(
-                LibrarianMenuOption.allCases,
+                LibrarianMenu.allCases,
                 title: "LIBRARIAN MENU"
             )
             
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: LibrarianMenuOption.allCases
+                    from: LibrarianMenu.allCases
                 )
             else {
                 consolePrinter.showError("Invalid choice")
@@ -95,7 +95,7 @@ final class LibrarianController: ProfileManagable {
                 title: title,
                 author: author,
                 category: category,
-                totalCopies: copies
+                copiesToAdd: copies
             )
             print("Book '\(title)' added successfully with \(copies) copies!")
         } catch {
@@ -308,7 +308,7 @@ final class LibrarianController: ProfileManagable {
 
 extension LibrarianController {
     
-    enum LibrarianMenuOption: String, CaseIterable {
+    enum LibrarianMenu: String, CaseIterable {
         case addBook = "Add New Book"
         case removeBook = "Remove Book"
         case viewPendingRequests = "View Pending Borrow Requests"

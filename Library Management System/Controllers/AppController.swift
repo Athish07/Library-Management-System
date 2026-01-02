@@ -39,7 +39,7 @@ final class AppController {
                 )
             else {
                 consolePrinter.showError("Invalid choice")
-                return
+                continue
             }
 
             switch choice {

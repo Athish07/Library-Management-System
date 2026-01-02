@@ -21,6 +21,7 @@ final class UserController: ProfileManagable {
     func start() {
         
         while true {
+            
             consolePrinter.showMenu(UserMenuOption.allCases, title: "USER MENU")
             
             guard

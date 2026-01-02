@@ -28,8 +28,6 @@ final class ReportManager: ReportService {
         let issues = issuedBookRepository.getAllIssuedBooks()
             .filter { $0.bookId == bookId }
             .sorted { $0.issueDate < $1.issueDate }
-
-        // compacMap helps to avoid nil value.
         
         let history = issues.compactMap { issued -> IssuedBookHistory? in
             guard let user = userRepository.findById(issued.userId) else {
@@ -44,7 +42,6 @@ final class ReportManager: ReportService {
             )
         }
         return history
-        
     }
 
     func getOverdueBooks() -> [OverdueBookItem] {

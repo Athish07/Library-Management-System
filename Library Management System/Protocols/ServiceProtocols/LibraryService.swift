@@ -12,7 +12,7 @@ protocol LibraryService {
         title: String,
         author: String,
         category: BookCategory,
-        totalCopies: Int
+        copiesToAdd: Int
     ) throws
     func removeBook(bookId: UUID) throws
     func getAllBooks() -> [Book]

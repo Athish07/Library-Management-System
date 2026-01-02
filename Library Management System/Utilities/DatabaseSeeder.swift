@@ -30,7 +30,7 @@ struct DatabaseSeeder {
                 password: "Athish_07",
                 phoneNumber: "7904411578",
                 address: "123 Test Street",
-                role: .customer
+                role: .user
             )
             userRepository.save(testUser)
         }

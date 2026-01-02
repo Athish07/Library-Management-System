@@ -69,8 +69,8 @@ final class AppController {
         switch choice {
         case .librarian:
             login(as: .librarian)
-        case .customer:
-            login(as: .customer)
+        case .user:
+            login(as: .user)
         }
     }
 
@@ -99,7 +99,7 @@ final class AppController {
                     consolePrinter: consolePrinter
                 ).start()
 
-            case .customer:
+            case .user:
                 UserController(
                     currentUserId: user.userId,
                     libraryService: libraryService,

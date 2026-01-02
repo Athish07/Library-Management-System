@@ -32,7 +32,7 @@ final class AuthenticationManager: AuthenticationService {
         phoneNumber: String,
         address: String,
     ) throws {
-
+        
         if userRepository.findByEmail(email) != nil {
             throw AuthenticationError.userAlreadyExists
         }
@@ -43,7 +43,7 @@ final class AuthenticationManager: AuthenticationService {
             password: password,
             phoneNumber: phoneNumber,
             address: address,
-            role: .customer
+            role: .user
         )
 
         userRepository.save(user)

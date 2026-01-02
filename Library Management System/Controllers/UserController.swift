@@ -38,6 +38,7 @@ final class UserController: ProfileManagable {
             case .viewAvailableBooks: viewAvailableBooks()
             case .viewMyBorrowedBooks: viewMyBorrowedBooks()
             case .requestBorrow: requestBorrowBook()
+            case .renewBook: renewBook()
             case .returnBook: returnBook()
             case .viewProfile: viewProfile()
             case .updateProfile: updateProfile()
@@ -94,7 +95,7 @@ final class UserController: ProfileManagable {
                     let book = try libraryService.getBook(bookId: issued.bookId)
                     consolePrinter.printBookDetails(book)
                     print("   Issued: \((issued.issueDate))")
-                    print("   Due: \(issued.dueDate.formattedMediumDateTime)")
+                    print("   Due: \(issued.dueDate.formatted)")
                     if issued.isOverdue {
                         let days = issued.daysOverdue
                         print("OVERDUE by \(days) day(s)")
@@ -147,12 +148,57 @@ final class UserController: ProfileManagable {
         }
     }
 
+    private func renewBook() {
+
+        let borrowed = libraryService.getBorrowedBooks(for: userId)
+
+        if borrowed.isEmpty {
+            consolePrinter.showError("You have no book to renew.")
+        }
+
+        for issued in borrowed {
+
+            do {
+                let book = try libraryService.getBook(bookId: issued.bookId)
+                consolePrinter.issuedBookDetails(issuedBook: issued, book: book)
+
+            } catch {
+
+                consolePrinter.showError(error.localizedDescription)
+            }
+        }
+
+        guard
+            let index = InputUtils.readInt(
+                "Enter Book Number to renew (Press ENTER to return:)",
+                allowCancel: true
+            ), (1...borrowed.count).contains(index)
+        else {
+            print("Renew Cancelled")
+            return
+        }
+
+        let selected = borrowed[index - 1]
+
+        do {
+            let updatedIssueBook = try libraryService.renewBook(
+                selected.issueId
+            )
+            print(
+                "Book renewed Successfully extended till \(updatedIssueBook.dueDate)"
+            )
+        } catch {
+            consolePrinter.showError(error.localizedDescription)
+        }
+
+    }
+
     private func returnBook() {
 
         let borrowed = libraryService.getBorrowedBooks(for: userId)
 
         if borrowed.isEmpty {
-            print("You have no books to return.")
+            consolePrinter.showError("You have no books to return.")
             return
         }
 
@@ -166,7 +212,7 @@ final class UserController: ProfileManagable {
                 consolePrinter.printBookDetails(book)
 
                 print(
-                    " Due: \(issued.dueDate.formattedMediumDateTime) \(issued.isOverdue ? "OVERDUE" : "")"
+                    " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
                 )
             } catch {
                 consolePrinter.showError(error.localizedDescription)
@@ -204,16 +250,16 @@ final class UserController: ProfileManagable {
 }
 
 extension UserController {
-
+    
     enum UserMenuOption: String, CaseIterable {
         case searchBooks = "Search Books"
         case viewAvailableBooks = "View All Available Books"
         case viewMyBorrowedBooks = "View My Borrowed Books"
         case requestBorrow = "Request to Borrow a Book"
+        case renewBook = "Renew the Borrowed Book"
         case returnBook = "Return a Book"
         case viewProfile = "View Profile"
         case updateProfile = "Update Profile"
         case logout = "Logout"
     }
-
 }

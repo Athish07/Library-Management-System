@@ -18,6 +18,7 @@ protocol LibraryService {
     func getAllBooks() -> [Book]
     func getAllPendingRequests() -> [BorrowRequest]
     func getAllIssuedBooks() -> [IssuedBook]
-    func approveBorrowRequest(requestId: UUID, dueInDays: Int) throws
+    func approveBorrowRequest(requestId: UUID) throws
     func rejectBorrowRequest(requestId: UUID) throws
+    func renewBook(_ issueId: UUID) throws -> IssuedBook
 }

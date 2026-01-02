@@ -6,6 +6,8 @@ final class LibraryManager: LibraryService {
     private let borrowRequestRepository: BorrowRequestRepository
     private let issuedBookRepository: IssuedBookRepository
     private let finePerDay: Double = 1.0
+    let dueInDays: Int = 14
+    let extensionDays: Int = 7
 
     init(
         bookRepository: BookRepository,
@@ -96,9 +98,35 @@ final class LibraryManager: LibraryService {
         }
 
         issuedBookRepository.save(issuedBook)
-
         return fine
+        
+    }
 
+    func renewBook(_ issueId: UUID) throws -> IssuedBook {
+
+        guard var issued = issuedBookRepository.findById(issueId) else {
+            throw LibraryError.issueNotFound
+        }
+
+        guard !issued.isOverdue else {
+            throw LibraryError.cannotRenewOverdue
+        }
+
+        guard
+            let newDueDate = Calendar.current.date(
+                byAdding: .day,
+                value: extensionDays,
+                to: issued.dueDate
+            )
+        else {
+            fatalError("Date calculation failed")
+        }
+
+        issued.updateDueDate(updatedDate: newDueDate)
+        issuedBookRepository.save(issued)
+        
+        return issued
+        
     }
 
     func addBook(
@@ -170,7 +198,7 @@ final class LibraryManager: LibraryService {
         return book
     }
 
-    func approveBorrowRequest(requestId: UUID, dueInDays: Int) throws {
+    func approveBorrowRequest(requestId: UUID) throws {
 
         guard var request = borrowRequestRepository.findById(requestId) else {
             throw LibraryError.requestNotFound
@@ -242,6 +270,7 @@ extension LibraryManager {
         case invalidReturnDate
         case invalidCopyCount
         case bookCurrentlyIssued
+        case cannotRenewOverdue
         case requestNotFound
         case requestNotPending
 
@@ -258,6 +287,8 @@ extension LibraryManager {
                 return "Return date cannot be before issue date."
             case .invalidCopyCount:
                 return "Number of copies must be greater than zero."
+            case .cannotRenewOverdue:
+                return "Cannot renew an Overdued"
             case .bookCurrentlyIssued:
                 return "Cannot remove book while copies are issued."
             case .requestNotFound: return "Borrow request not found."

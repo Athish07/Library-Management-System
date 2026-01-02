@@ -7,7 +7,6 @@ final class LibrarianController: ProfileManagable {
     let consolePrinter: ConsolePrinter
     private let libraryService: LibraryService
     private let reportService: ReportService
-    private let defaultBorrowPeriod: Int = 14
 
     init(
         currentUserId: UUID,
@@ -155,7 +154,7 @@ final class LibrarianController: ProfileManagable {
                 consolePrinter.printBookDetails(book)
 
                 print(
-                    "Request Date: \(request.requestDate.formattedMediumDateTime)"
+                    "Request Date: \(request.requestDate.formatted)"
                 )
                 print(
                     "Requested By: \(userService.getUserById(request.userId)?.name ?? "Unknown")"
@@ -195,8 +194,7 @@ final class LibrarianController: ProfileManagable {
             switch action {
             case .issue:
                 try libraryService.approveBorrowRequest(
-                    requestId: selected.requestId,
-                    dueInDays: defaultBorrowPeriod
+                    requestId: selected.requestId
                 )
                 print("Request approved and book issued.")
             case .reject:
@@ -290,17 +288,8 @@ final class LibrarianController: ProfileManagable {
                     let book = try libraryService.getBook(
                         bookId: issuedBook.bookId
                     )
-                    print(
-                        """
-                        Issued Book Details : 
-                        Book Title: \(book.title)
-                        Book Author: \(book.author)
-                        Book Category: \(book.category)
-                        Issued Date : \(issuedBook.issueDate)
-                        Due Date: \(issuedBook.dueDate)
-                        Days OverDued: \(issuedBook.daysOverdue)
-                        """
-                    )
+                    consolePrinter.issuedBookDetails(issuedBook: issuedBook, book: book)
+                    
                 } catch {
                     consolePrinter.showError(error.localizedDescription)
                 }

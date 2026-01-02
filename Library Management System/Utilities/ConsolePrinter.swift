@@ -1,6 +1,6 @@
 import Foundation
 
-final class ConsolePrinter {
+struct ConsolePrinter {
 
     func showMenu<T: CaseIterable & RawRepresentable>(
         _ options: [T],
@@ -21,18 +21,41 @@ final class ConsolePrinter {
     }
 
     func printBookDetails(_ book: Book) {
-        print("\(book.title)")
-        print("Author: \(book.author)")
-        print("Category: \(book.category.rawValue)")
-        print("Available: \(book.availableCopies)/\(book.totalCopies)")
+        print(
+            """
+            Title: \(book.title)
+            Author: \(book.author)
+            Category: \(book.category.rawValue)
+            Available: \(book.availableCopies)/\(book.totalCopies)
+            """
+        )
         print(String(repeating: "==", count: 10))
     }
 
     func printUserDetails(_ user: User) {
-        print("UserName: \(user.name)")
-        print("Email: \(user.email)")
-        print("Address: \(user.address)")
-        print("Role: \(user.role.rawValue)")
+        print(
+            """
+            User Details: 
+            UserName: \(user.name) 
+            Email: \(user.email)
+            Address: \(user.address)
+            Role: \(user.role.rawValue)
+            """
+        )
+    }
+
+    func issuedBookDetails(issuedBook: IssuedBook, book: Book) {
+        print(
+            """
+            Issued Book Details :
+            Book Title: \(book.title)
+            Book Author: \(book.author)
+            Book Category: \(book.category)
+            Issued Date : \(issuedBook.issueDate)
+            Due Date: \(issuedBook.dueDate)
+            Days OverDued: \(issuedBook.daysOverdue)
+            """
+        )
     }
 
     func readUpdateUser(_ user: User) -> User {

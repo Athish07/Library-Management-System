@@ -116,20 +116,20 @@ final class LibrarianController: ProfileManagable {
         }
 
         guard
-            let index = InputUtils.readInt(
-                "Enter book number to remove (or press Enter to cancel)",
-                allowCancel: true
-            ), (1...books.count).contains(index)
+            let index = InputUtils.readValidIndex(
+                from: books.count,
+                prompt:
+                    "Enter book number to remove (or press Enter to cancel)"
+            )
         else {
-            print("Remove cancelled.")
             return
         }
 
-        let book = books[index - 1]
-
+        let selectedBook = books[index]
+        
         do {
-            try libraryService.removeBook(bookId: book.bookId)
-            print("Book '\(book.title)' removed successfully.")
+            try libraryService.removeBook(bookId: selectedBook.bookId)
+            print("Book '\(selectedBook.title)' removed successfully.")
         } catch {
             consolePrinter.showError(error.localizedDescription)
         }
@@ -164,18 +164,19 @@ final class LibrarianController: ProfileManagable {
                 consolePrinter.showError(error.localizedDescription)
             }
         }
-
+        
         guard
-            let choice = InputUtils.readInt(
-                "Enter request number to manage (or press Enter to go back)",
-                allowCancel: true
+            let choice = InputUtils.readValidIndex(
+                from: requests.count,
+                prompt:
+                    "Enter request number to manage (or press Enter to go back)"
             )
         else {
             return
         }
-
-        let selected = requests[choice - 1]
-
+        
+        let selected = requests[choice]
+        
         consolePrinter.showMenu(
             BorrowRequestAction.allCases,
             title: "Manage Borrow Request"
@@ -223,12 +224,12 @@ final class LibrarianController: ProfileManagable {
         }
 
         guard
-            let index = InputUtils.readInt(
-                "Select book number (Press Enter to cancel)",
-                allowCancel: true
-            ), (1...books.count).contains(index)
+            let index = InputUtils.readValidIndex(
+                from: books.count,
+                prompt: "Select book number (Press Enter to cancel)"
+            )
         else { return }
-
+        
         do {
             let history = try reportService.getIssuedBookHistory(
                 bookId: books[index - 1].bookId

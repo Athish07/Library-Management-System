@@ -145,22 +145,23 @@ final class UserController: ProfileManagable {
         }
 
         print("Available Books to Borrow:")
+        
         for (index, book) in books.enumerated() {
             print("\(index + 1). ", terminator: "")
             consolePrinter.printBookDetails(book)
         }
 
         guard
-            let index = InputUtils.readInt(
-                "Enter book number to request (or press Enter to cancel)",
-                allowCancel: true
-            ), (1...books.count).contains(index)
+            let index = InputUtils.readValidIndex(
+                from: books.count,
+                prompt:
+                    "Enter book number to request (or press Enter to cancel)"
+            )
         else {
-            print("Borrow request cancelled.")
             return
         }
 
-        let selectedBook = books[index - 1]
+        let selectedBook = books[index]
 
         do {
             try libraryService.requestBorrow(
@@ -234,8 +235,8 @@ extension UserController {
             do {
                 let book = try libraryService.getBook(bookId: issued.bookId)
                 
-                print("\(index + 1). ", terminator: "")
-                consolePrinter.printBookDetails(book)
+//                print("\(index + 1). ", terminator: "")
+//                consolePrinter.printBookDetails(book)
                 
                 print(
                     " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
@@ -246,16 +247,16 @@ extension UserController {
         }
         
         guard
-            let index = InputUtils.readInt(
-                "Enter Book Number (Press ENTER to return:)",
-                allowCancel: true
-            ), (1...borrowed.count).contains(index)
+            let index = InputUtils.readValidIndex(
+                from: borrowed.count,
+                prompt:
+                    "Enter book number to request (or press Enter to cancel)"
+            )
         else {
-            print("Renew Cancelled")
             return nil
         }
-        
-        return borrowed[index - 1]
+
+        return borrowed[index]
         
     }
     

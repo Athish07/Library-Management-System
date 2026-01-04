@@ -1,11 +1,11 @@
 import Foundation
 
-struct ConsolePrinter {
+final class ConsolePrinter {
 
     func showMenu<T: CaseIterable & RawRepresentable>(
         _ options: [T],
         title: String
-    ) where T.RawValue == String {
+    ) {
 
         print("=== \(title) ===\n")
 
@@ -43,52 +43,5 @@ struct ConsolePrinter {
             """
         )
     }
-
-    func issuedBookDetails(issuedBook: IssuedBook, book: Book) {
-        print(
-            """
-            Issued Book Details :
-            Book Title: \(book.title)
-            Book Author: \(book.author)
-            Book Category: \(book.category)
-            Issued Date : \(issuedBook.issueDate)
-            Due Date: \(issuedBook.dueDate)
-            Days OverDued: \(issuedBook.daysOverdue)
-            """
-        )
-    }
-
-    func readUpdateUser(_ user: User) -> User {
-
-        print("\n press ENTER if you want to proceed with the same detail. \n")
-
-        let name = InputUtils.readString(
-            "Enter Name(current Name \(user.name))",
-            allowEmpty: true
-        )
-        let email = InputUtils.readEmail(
-            "Enter Email(current Email \(user.email))",
-            allowEmpty: true
-        )
-        let phoneNumber = InputUtils.readPhoneNumber(
-            "Enter PhoneNumber(current phoneNumber \(user.phoneNumber))",
-            allowEmpty: true
-        )
-        let address = InputUtils.readString(
-            "Enter Address(current Address \(user.address))",
-            allowEmpty: true
-        )
-
-        return User(
-            userId: user.userId,
-            name: name,
-            email: email,
-            password: user.password,
-            phoneNumber: phoneNumber,
-            address: address,
-            role: user.role
-        )
-
-    }
-
+    
 }

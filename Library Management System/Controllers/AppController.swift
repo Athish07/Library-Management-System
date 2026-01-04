@@ -1,9 +1,7 @@
 import Foundation
 
 final class AppController {
-
-    typealias MenuOption = PublicMenu
-
+    
     private let authenticationService: AuthenticationService
     private let libraryService: LibraryService
     private let userService: UserService
@@ -29,13 +27,13 @@ final class AppController {
         while true {
 
             consolePrinter.showMenu(
-                PublicMenu.allCases,
+                MainMenu.allCases,
                 title: "LIBRARY MANAGEMENT SYSTEM"
             )
 
             guard
                 let choice = InputUtils.readMenuChoice(
-                    from: PublicMenu.allCases
+                    from: MainMenu.allCases
                 )
             else {
                 consolePrinter.showError("Invalid choice")
@@ -81,12 +79,12 @@ final class AppController {
         let password = InputUtils.readPassword("Enter Password")
 
         do {
+            
             let user = try authenticationService.login(
                 email: email,
                 password: password,
                 role: role
             )
-
             print("Login successful! Welcome, \(user.name).")
 
             switch role {
@@ -104,6 +102,7 @@ final class AppController {
                     currentUserId: user.userId,
                     libraryService: libraryService,
                     userService: userService,
+                    reportService: reportService,
                     consolePrinter: consolePrinter
                 ).start()
             }
@@ -152,7 +151,7 @@ final class AppController {
 
 extension AppController {
 
-    enum PublicMenu: String, CaseIterable {
+    enum MainMenu: String, CaseIterable {
         case login = "Login"
         case register = "Register"
         case exit = "Exit"

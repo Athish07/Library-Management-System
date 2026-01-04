@@ -25,7 +25,35 @@ extension ProfileManagable {
 
         consolePrinter.printUserDetails(user)
 
-        let updatedUser = consolePrinter.readUpdateUser(user)
+        print("\n press ENTER if you want to proceed with the same detail. \n")
+
+        let name = InputUtils.readString(
+            "Enter Name(current Name \(user.name))",
+            allowEmpty: true
+        )
+        let email = InputUtils.readEmail(
+            "Enter Email(current Email \(user.email))",
+            allowEmpty: true
+        )
+        let phoneNumber = InputUtils.readPhoneNumber(
+            "Enter PhoneNumber(current phoneNumber \(user.phoneNumber))",
+            allowEmpty: true
+        )
+        let address = InputUtils.readString(
+            "Enter Address(current Address \(user.address))",
+            allowEmpty: true
+        )
+
+       let updatedUser = User(
+            userId: user.userId,
+            name: name,
+            email: email,
+            password: user.password,
+            phoneNumber: phoneNumber,
+            address: address,
+            role: user.role
+        )
+        
         let result = userService.updateProfile(updatedUser)
 
         switch result {

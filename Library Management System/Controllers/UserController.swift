@@ -5,17 +5,21 @@ final class UserController: ProfileManagable {
     let userService: UserService
     let consolePrinter: ConsolePrinter
     private let libraryService: LibraryService
+    private let reportService: ReportService
 
     init(
         currentUserId: UUID,
         libraryService: LibraryService,
         userService: UserService,
+        reportService: ReportService,
         consolePrinter: ConsolePrinter
     ) {
         self.userId = currentUserId
         self.libraryService = libraryService
         self.userService = userService
+        self.reportService = reportService
         self.consolePrinter = consolePrinter
+        
     }
 
     func start() {
@@ -40,6 +44,7 @@ final class UserController: ProfileManagable {
             case .requestBorrow: requestBorrowBook()
             case .renewBook: renewBook()
             case .returnBook: returnBook()
+            case .borrowRequestHistory: borrowRequestHistory()
             case .viewProfile: viewProfile()
             case .updateProfile: updateProfile()
             case .logout:
@@ -108,8 +113,30 @@ final class UserController: ProfileManagable {
         }
 
     }
+    
+    private func borrowRequestHistory() {
+        
+        let history = reportService.getBorrowRequestHistory(userId: userId)
+        
+        if history.isEmpty {
+            print("No request history available.")
+            return
+        }
+        
+        for request in history {
+            
+            print(
+                """
+                Title : \(request.title)
+                Author : \(request.author)
+                Status : \(request.status)
+                """
+            )
+        }
+    }
 
     private func requestBorrowBook() {
+
         let books = libraryService.getAvailableBooks()
 
         if books.isEmpty {
@@ -150,35 +177,9 @@ final class UserController: ProfileManagable {
 
     private func renewBook() {
 
-        let borrowed = libraryService.getBorrowedBooks(for: userId)
-
-        if borrowed.isEmpty {
-            consolePrinter.showError("You have no book to renew.")
-        }
-
-        for issued in borrowed {
-
-            do {
-                let book = try libraryService.getBook(bookId: issued.bookId)
-                consolePrinter.issuedBookDetails(issuedBook: issued, book: book)
-
-            } catch {
-
-                consolePrinter.showError(error.localizedDescription)
-            }
-        }
-
-        guard
-            let index = InputUtils.readInt(
-                "Enter Book Number to renew (Press ENTER to return:)",
-                allowCancel: true
-            ), (1...borrowed.count).contains(index)
-        else {
-            print("Renew Cancelled")
+        guard let selected = selectBorrowedBook() else {
             return
         }
-
-        let selected = borrowed[index - 1]
 
         do {
             let updatedIssueBook = try libraryService.renewBook(
@@ -192,43 +193,12 @@ final class UserController: ProfileManagable {
         }
 
     }
-
+    
     private func returnBook() {
 
-        let borrowed = libraryService.getBorrowedBooks(for: userId)
-
-        if borrowed.isEmpty {
-            consolePrinter.showError("You have no books to return.")
+        guard let selected = selectBorrowedBook() else {
             return
         }
-
-        print("Your Borrowed Books:")
-
-        for (index, issued) in borrowed.enumerated() {
-            do {
-                let book = try libraryService.getBook(bookId: issued.bookId)
-
-                print("\(index + 1). ", terminator: "")
-                consolePrinter.printBookDetails(book)
-
-                print(
-                    " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
-                )
-            } catch {
-                consolePrinter.showError(error.localizedDescription)
-            }
-        }
-
-        guard
-            let index = InputUtils.readInt(
-                "Enter book number to return (press ENTER to cancel operation)",
-                allowCancel: true
-            ), (1...borrowed.count).contains(index)
-        else {
-            print("Return cancelled.")
-            return
-        }
-        let selected = borrowed[index - 1]
 
         do {
             let fine = try libraryService.returnBook(
@@ -251,6 +221,44 @@ final class UserController: ProfileManagable {
 
 extension UserController {
     
+    private func selectBorrowedBook() -> IssuedBook? {
+        
+        let borrowed = libraryService.getBorrowedBooks(for: userId)
+        
+        if borrowed.isEmpty {
+            consolePrinter.showError("No book available.")
+        }
+        print("Your Borrowed Books:")
+        
+        for (index, issued) in borrowed.enumerated() {
+            do {
+                let book = try libraryService.getBook(bookId: issued.bookId)
+                
+                print("\(index + 1). ", terminator: "")
+                consolePrinter.printBookDetails(book)
+                
+                print(
+                    " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
+                )
+            } catch {
+                consolePrinter.showError(error.localizedDescription)
+            }
+        }
+        
+        guard
+            let index = InputUtils.readInt(
+                "Enter Book Number (Press ENTER to return:)",
+                allowCancel: true
+            ), (1...borrowed.count).contains(index)
+        else {
+            print("Renew Cancelled")
+            return nil
+        }
+        
+        return borrowed[index - 1]
+        
+    }
+    
     enum UserMenuOption: String, CaseIterable {
         case searchBooks = "Search Books"
         case viewAvailableBooks = "View All Available Books"
@@ -258,8 +266,10 @@ extension UserController {
         case requestBorrow = "Request to Borrow a Book"
         case renewBook = "Renew the Borrowed Book"
         case returnBook = "Return a Book"
+        case borrowRequestHistory = "View BorrowRequest History"
         case viewProfile = "View Profile"
         case updateProfile = "Update Profile"
         case logout = "Logout"
     }
+    
 }

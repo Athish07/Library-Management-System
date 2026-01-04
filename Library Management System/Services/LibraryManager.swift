@@ -142,14 +142,13 @@ final class LibraryManager: LibraryService {
 
         let allBooks = bookRepository.getAllBooks()
 
-        if let existingBook = allBooks.first(where: {
+        if var existingBook = allBooks.first(where: {
             $0.title.lowercased() == title.lowercased()
                 && $0.author.lowercased() == author.lowercased()
                 && $0.category == category
         }) {
-            var updatedBook = existingBook
-            updatedBook.addCopies(copiesToAdd)
-            bookRepository.save(updatedBook)
+            existingBook.addCopies(copiesToAdd)
+            bookRepository.save(existingBook)
         } else {
             let newBook = Book(
                 title: title,
@@ -204,17 +203,16 @@ final class LibraryManager: LibraryService {
             throw LibraryError.requestNotFound
         }
 
-        guard let book = bookRepository.findById(request.bookId),
+        guard var book = bookRepository.findById(request.bookId),
             book.availableCopies > 0
         else {
             throw LibraryError.bookUnavailable
         }
-
-        var mutableBook = book
-        guard mutableBook.issueCopy() else {
+        
+        guard book.issueCopy() else {
             throw LibraryError.bookUnavailable
         }
-        bookRepository.save(mutableBook)
+        bookRepository.save(book)
         let issueDate = Date()
 
         guard

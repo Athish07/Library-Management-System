@@ -288,8 +288,18 @@ final class LibrarianController: ProfileManagable {
                     let book = try libraryService.getBook(
                         bookId: issuedBook.bookId
                     )
-                    consolePrinter.issuedBookDetails(issuedBook: issuedBook, book: book)
-                    
+                    print(
+                        """
+                        Issued Book Details :
+                        Book Title: \(book.title)
+                        Book Author: \(book.author)
+                        Book Category: \(book.category)
+                        Issued Date : \(issuedBook.issueDate)
+                        Due Date: \(issuedBook.dueDate)
+                        Days OverDued: \(issuedBook.daysOverdue)
+                        """
+                    )
+
                 } catch {
                     consolePrinter.showError(error.localizedDescription)
                 }

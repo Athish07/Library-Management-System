@@ -5,15 +5,18 @@ final class ReportManager: ReportService {
     private let userRepository: UserRepository
     private let bookRepository: BookRepository
     private let issuedBookRepository: IssuedBookRepository
+    private let borrowRequestRepository: BorrowRequestRepository
 
     init(
         userRepository: UserRepository,
         bookRepository: BookRepository,
         issuedBookRepository: IssuedBookRepository,
+        borrowRequestRepository: BorrowRequestRepository
     ) {
         self.userRepository = userRepository
         self.bookRepository = bookRepository
         self.issuedBookRepository = issuedBookRepository
+        self.borrowRequestRepository = borrowRequestRepository
     }
 
     func getIssuedBookHistory(bookId: UUID) throws -> [IssuedBookHistory] {
@@ -62,7 +65,25 @@ final class ReportManager: ReportService {
 
         return history
     }
-
+    
+    func getBorrowRequestHistory(userId: UUID) -> [BorrowRequestHistory] {
+        
+        let borrowRequests = borrowRequestRepository.getByUserId(userId)
+        
+        let history =  borrowRequests.compactMap {  borrowed -> (BorrowRequestHistory)? in
+            
+            guard let book = bookRepository.findById(borrowed.bookId) else {
+                return nil
+            }
+            return BorrowRequestHistory(
+                title: book.title,
+                author: book.author,
+                status: borrowed.status.rawValue
+            )
+        }
+        return history
+    }
+    
 }
 
 extension ReportManager {

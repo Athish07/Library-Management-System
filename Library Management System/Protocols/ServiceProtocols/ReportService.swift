@@ -14,9 +14,16 @@ struct OverdueBookItem {
     let daysOverdue: Int
 }
 
+struct BorrowRequestHistory {
+    let title: String
+    let author: String
+    let status: String
+}
 
 protocol ReportService {
     func getIssuedBookHistory(bookId: UUID) throws -> [IssuedBookHistory]
     func getOverdueBooks() -> [OverdueBookItem]
+    func getBorrowRequestHistory(userId: UUID) -> [BorrowRequestHistory]
+    
 }
 

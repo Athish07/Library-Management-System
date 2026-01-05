@@ -34,10 +34,9 @@ final class UserController: ProfileManagable {
             }
 
             switch choice {
-            case .searchBooks: searchBooks()
+            case .searchToBorrowBooks: searchBooks()
             case .viewAvailableBooks: viewAvailableBooks()
             case .viewMyBorrowedBooks: viewMyBorrowedBooks()
-            case .requestBorrow: requestBorrowBook()
             case .renewBook: renewBook()
             case .returnBook: returnBook()
             case .borrowRequestHistory: borrowRequestHistory()
@@ -56,16 +55,22 @@ final class UserController: ProfileManagable {
             "Enter search term (title/author/category)"
         )
 
-        let results = libraryService.search(by: query)
+        let books = libraryService.search(by: query)
 
-        if results.isEmpty {
+        if books.isEmpty {
             print(" No books found matching '\(query)'.")
+            return
+
         } else {
-            print(" Search Results (\(results.count) found):")
-            for book in results {
+            print(" Search Results (\(books.count) found):")
+
+            for (index, book) in books.enumerated() {
+                print("\(index + 1). ", terminator: "")
                 OutputUtils.printBookDetails(book)
             }
         }
+
+        requestBorrow(books)
     }
 
     private func viewAvailableBooks() {
@@ -76,10 +81,28 @@ final class UserController: ProfileManagable {
             print(" No books are currently available.")
         } else {
             print(" Available Books (\(books.count)):")
-            for book in books {
+            for (index, book) in books.enumerated() {
+                print("\(index + 1). ", terminator: "")
                 OutputUtils.printBookDetails(book)
             }
         }
+
+        print(
+            "\nDo you want to request to borrow any of these books? (y/n):",
+            terminator: ""
+        )
+
+        let response = readLine()?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        ).lowercased()
+
+        guard response == "y" || response == "yes" else {
+            print("Returning to menu...")
+            return
+        }
+
+        requestBorrow(books)
+
     }
 
     private func viewMyBorrowedBooks() {
@@ -109,18 +132,18 @@ final class UserController: ProfileManagable {
         }
 
     }
-    
+
     private func borrowRequestHistory() {
-        
+
         let history = reportService.getBorrowRequestHistory(userId: userId)
-        
+
         if history.isEmpty {
             print("No request history available.")
             return
         }
-        
+
         for request in history {
-            
+
             print(
                 """
                 Title : \(request.title)
@@ -128,45 +151,6 @@ final class UserController: ProfileManagable {
                 Status : \(request.status)
                 """
             )
-        }
-    }
-
-    private func requestBorrowBook() {
-
-        let books = libraryService.getAvailableBooks()
-
-        if books.isEmpty {
-            print("No books available to borrow right now.")
-            return
-        }
-
-        print("Available Books to Borrow:")
-        
-        for (index, book) in books.enumerated() {
-            print("\(index + 1). ", terminator: "")
-            OutputUtils.printBookDetails(book)
-        }
-
-        guard
-            let selectedBook = InputUtils.readMenuChoice(
-                from: books,
-                prompt:
-                    "Enter book number to request (or press ENTER to move back)"
-            )
-        else {
-            return
-        }
-        
-        do {
-            try libraryService.requestBorrow(
-                bookId: selectedBook.bookId,
-                by: userId
-            )
-            print(
-                " Borrow request sent for '\(selectedBook.title)'!\nLibrarian will review it soon."
-            )
-        } catch {
-            OutputUtils.showError(error.localizedDescription)
         }
     }
 
@@ -188,7 +172,7 @@ final class UserController: ProfileManagable {
         }
 
     }
-    
+
     private func returnBook() {
 
         guard let selected = selectBorrowedBook() else {
@@ -215,24 +199,24 @@ final class UserController: ProfileManagable {
 }
 
 extension UserController {
-    
+
     private func selectBorrowedBook() -> IssuedBook? {
-        
+
         let borrowed = libraryService.getBorrowedBooks(for: userId)
-        
+
         if borrowed.isEmpty {
             OutputUtils.showError("No book available.")
             return nil
         }
         print("Your Borrowed Books:")
-        
+
         for (index, issued) in borrowed.enumerated() {
             do {
                 let book = try libraryService.getBook(bookId: issued.bookId)
-                
+
                 print("\(index + 1). ", terminator: "")
                 OutputUtils.printBookDetails(book)
-                
+
                 print(
                     " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
                 )
@@ -240,7 +224,7 @@ extension UserController {
                 OutputUtils.showError(error.localizedDescription)
             }
         }
-        
+
         guard
             let selectedBook = InputUtils.readMenuChoice(
                 from: borrowed,
@@ -250,16 +234,41 @@ extension UserController {
         else {
             return nil
         }
-        
+
         return selectedBook
-        
+
     }
-    
+
+    private func requestBorrow(_ books: [Book]) {
+
+        guard
+            let selectedBook = InputUtils.readMenuChoice(
+                from: books,
+                prompt:
+                    "Enter book number to request (or press ENTER to move back)"
+            )
+        else {
+            return
+        }
+
+        do {
+            try libraryService.requestBorrow(
+                bookId: selectedBook.bookId,
+                by: userId
+            )
+            print(
+                " Borrow request sent for '\(selectedBook.title)'!\nLibrarian will review it soon."
+            )
+        } catch {
+            OutputUtils.showError(error.localizedDescription)
+        }
+
+    }
+
     enum UserMenuOption: String, CaseIterable {
-        case searchBooks = "Search Books"
-        case viewAvailableBooks = "View All Available Books"
+        case searchToBorrowBooks = "Search to Borrow Books"
+        case viewAvailableBooks = "View All Available Books and make borrow"
         case viewMyBorrowedBooks = "View My Borrowed Books"
-        case requestBorrow = "Request to Borrow a Book"
         case renewBook = "Renew the Borrowed Book"
         case returnBook = "Return a Book"
         case borrowRequestHistory = "View BorrowRequest History"
@@ -267,5 +276,5 @@ extension UserController {
         case updateProfile = "Update Profile"
         case logout = "Logout"
     }
-    
+
 }

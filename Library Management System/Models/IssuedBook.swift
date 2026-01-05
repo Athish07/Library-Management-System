@@ -5,7 +5,7 @@ struct IssuedBook {
     let bookId: UUID
     let userId: UUID
     let issueDate: Date
-    
+
     private(set) var dueDate: Date
     private(set) var returnDate: Date?
     private(set) var fineAmount: Double
@@ -35,17 +35,17 @@ extension IssuedBook {
     mutating func applyFine(_ amount: Double) {
         fineAmount = max(0, amount)
     }
-    
+
     mutating func updateDueDate(updatedDate: Date) -> Bool {
-        guard dueDate < updatedDate else {return false}
+        guard dueDate < updatedDate else { return false }
         dueDate = updatedDate
         return true
     }
-    
+
     var isOverdue: Bool {
         returnDate == nil && Date() > dueDate
     }
-    
+
     var daysOverdue: Int {
         guard returnDate == nil else { return 0 }
 
@@ -57,5 +57,5 @@ extension IssuedBook {
             ).day ?? 0
         return max(0, days)
     }
-    
+
 }

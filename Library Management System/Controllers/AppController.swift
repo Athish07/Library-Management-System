@@ -1,12 +1,11 @@
 import Foundation
 
 final class AppController {
-    
+
     private let authenticationService: AuthenticationService
     private let libraryService: LibraryService
     private let userService: UserService
     private let reportService: ReportService
-   
 
     init(
         authenticationService: AuthenticationService,
@@ -86,7 +85,7 @@ final class AppController {
             print("Login successful! Welcome, \(user.name).")
 
             switch role {
-    
+
             case .librarian:
                 LibrarianController(
                     currentUserId: user.userId,

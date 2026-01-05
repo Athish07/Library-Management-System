@@ -63,13 +63,14 @@ final class ReportManager: ReportService {
 
         return history
     }
-    
+
     func getBorrowRequestHistory(userId: UUID) -> [BorrowRequestHistory] {
-        
+
         let borrowRequests = borrowRequestRepository.getByUserId(userId)
-        
-        let history =  borrowRequests.compactMap {  borrowed -> (BorrowRequestHistory)? in
-            
+
+        let history = borrowRequests.compactMap {
+            borrowed -> (BorrowRequestHistory)? in
+
             guard let book = bookRepository.findById(borrowed.bookId) else {
                 return nil
             }
@@ -81,7 +82,7 @@ final class ReportManager: ReportService {
         }
         return history
     }
-    
+
 }
 
 extension ReportManager {
@@ -98,4 +99,3 @@ extension ReportManager {
         }
     }
 }
-

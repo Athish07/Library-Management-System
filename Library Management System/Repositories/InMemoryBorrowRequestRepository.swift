@@ -11,7 +11,7 @@ final class InMemoryBorrowRequestRepository: BorrowRequestRepository {
     func findById(_ requestId: UUID) -> BorrowRequest? {
         requests[requestId]
     }
-    
+
     func getByUserId(_ userId: UUID) -> [BorrowRequest] {
         Array(requests.values).filter {
             $0.userId == userId

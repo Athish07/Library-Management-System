@@ -6,8 +6,8 @@ final class LibraryManager: LibraryService {
     private let borrowRequestRepository: BorrowRequestRepository
     private let issuedBookRepository: IssuedBookRepository
     private let finePerDay: Double = 1.0
-    let dueInDays: Int = 14
-    let extensionDays: Int = 7
+    private let dueInDays: Int = 14
+    private let extensionDays: Int = 7
 
     init(
         bookRepository: BookRepository,
@@ -99,7 +99,7 @@ final class LibraryManager: LibraryService {
 
         issuedBookRepository.save(issuedBook)
         return fine
-        
+
     }
 
     func renewBook(_ issueId: UUID) throws -> IssuedBook {
@@ -124,7 +124,7 @@ final class LibraryManager: LibraryService {
 
         issuedBookRepository.save(issued)
         return issued
-    
+
     }
 
     func addBook(
@@ -206,7 +206,7 @@ final class LibraryManager: LibraryService {
         else {
             throw LibraryError.bookUnavailable
         }
-        
+
         guard book.issueCopy() else {
             throw LibraryError.bookUnavailable
         }

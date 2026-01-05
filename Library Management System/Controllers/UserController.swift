@@ -34,8 +34,8 @@ final class UserController: ProfileManagable {
             }
 
             switch choice {
-            case .searchToBorrowBooks: searchBooks()
-            case .viewAvailableBooks: viewAvailableBooks()
+            case .searchToBorrowBooks: searchToBorrowBooks()
+            case .viewAvailableBooksAndBorrow: viewAvailableBooksAndBorrow()
             case .viewMyBorrowedBooks: viewMyBorrowedBooks()
             case .renewBook: renewBook()
             case .returnBook: returnBook()
@@ -49,7 +49,7 @@ final class UserController: ProfileManagable {
         }
     }
 
-    private func searchBooks() {
+    private func searchToBorrowBooks() {
 
         let query = InputUtils.readString(
             "Enter search term (title/author/category)"
@@ -73,7 +73,7 @@ final class UserController: ProfileManagable {
         requestBorrow(books)
     }
 
-    private func viewAvailableBooks() {
+    private func viewAvailableBooksAndBorrow() {
 
         let books = libraryService.getAvailableBooks()
 
@@ -267,7 +267,7 @@ extension UserController {
 
     enum UserMenuOption: String, CaseIterable {
         case searchToBorrowBooks = "Search to Borrow Books"
-        case viewAvailableBooks = "View All Available Books and make borrow"
+        case viewAvailableBooksAndBorrow = "View All Available Books and make borrow"
         case viewMyBorrowedBooks = "View My Borrowed Books"
         case renewBook = "Renew the Borrowed Book"
         case returnBook = "Return a Book"

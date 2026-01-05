@@ -14,7 +14,6 @@ final class UserManager: UserService {
         else {
             return .userNotFound
         }
-
         let mergedUser = User(
             userId: existingUser.userId,
             name: updatedUser.name.isEmpty
@@ -52,4 +51,3 @@ final class UserManager: UserService {
         userRepository.findById(userId)
     }
 }
-

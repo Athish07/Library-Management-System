@@ -43,7 +43,7 @@ extension ProfileManagable {
             allowEmpty: true
         )
 
-       let updatedUser = User(
+        let updatedUser = User(
             userId: user.userId,
             name: name,
             email: email,
@@ -52,16 +52,17 @@ extension ProfileManagable {
             address: address,
             role: user.role
         )
-        
+
         let result = userService.updateProfile(updatedUser)
 
         switch result {
         case .success:
             print("Profile updated successfully.")
         case .noChanges:
-            OutputUtils.showError("No changes detected.")
+            print("No changes detected.")
         case .userNotFound:
             OutputUtils.showError("User not found.")
         }
     }
+
 }

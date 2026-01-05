@@ -219,7 +219,7 @@ final class LibrarianController: ProfileManagable {
         guard
             let selectedBook = InputUtils.readMenuChoice(
                 from: books,
-                prompt: "Select book number (Press ENTER to move back)"
+                prompt: "\nSelect book number (Press ENTER to move back)"
             )
         else { return }
 

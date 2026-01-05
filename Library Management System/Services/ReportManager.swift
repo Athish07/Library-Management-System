@@ -25,9 +25,7 @@ final class ReportManager: ReportService {
             throw ReportError.bookNotFound
         }
 
-        let issues = issuedBookRepository.getAllIssuedBooks()
-            .filter { $0.bookId == bookId }
-            .sorted { $0.issueDate < $1.issueDate }
+        let issues = issuedBookRepository.getIssuedBooks(bookId: book.bookId)
 
         let history = issues.compactMap { issued -> IssuedBookHistory? in
             guard let user = userRepository.findById(issued.userId) else {

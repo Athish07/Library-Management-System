@@ -36,8 +36,10 @@ extension IssuedBook {
         fineAmount = max(0, amount)
     }
     
-    mutating func updateDueDate(updatedDate: Date) {
+    mutating func updateDueDate(updatedDate: Date) -> Bool {
+        guard dueDate < updatedDate else {return false}
         dueDate = updatedDate
+        return true
     }
     
     var isOverdue: Bool {

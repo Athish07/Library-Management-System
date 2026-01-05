@@ -117,13 +117,13 @@ final class LibraryManager: LibraryService {
                 byAdding: .day,
                 value: extensionDays,
                 to: issued.dueDate
-            )
+            ), issued.updateDueDate(updatedDate: newDueDate)
         else {
             fatalError("Date calculation failed")
         }
-
-        issued.updateDueDate(updatedDate: newDueDate)
+        
         issuedBookRepository.save(issued)
+            
         
         return issued
         

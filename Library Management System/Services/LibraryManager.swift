@@ -121,12 +121,10 @@ final class LibraryManager: LibraryService {
         else {
             fatalError("Date calculation failed")
         }
-        
+
         issuedBookRepository.save(issued)
-            
-        
         return issued
-        
+    
     }
 
     func addBook(

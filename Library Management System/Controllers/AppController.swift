@@ -6,27 +6,25 @@ final class AppController {
     private let libraryService: LibraryService
     private let userService: UserService
     private let reportService: ReportService
-    private let consolePrinter: ConsolePrinter
+   
 
     init(
         authenticationService: AuthenticationService,
         libraryService: LibraryService,
         userService: UserService,
-        consolePrinter: ConsolePrinter,
         reportService: ReportService
     ) {
         self.authenticationService = authenticationService
         self.libraryService = libraryService
         self.userService = userService
         self.reportService = reportService
-        self.consolePrinter = consolePrinter
     }
 
     func start() {
 
         while true {
 
-            consolePrinter.showMenu(
+            OutputUtils.showMenu(
                 MainMenu.allCases,
                 title: "LIBRARY MANAGEMENT SYSTEM"
             )
@@ -36,7 +34,7 @@ final class AppController {
                     from: MainMenu.allCases
                 )
             else {
-                consolePrinter.showError("Invalid choice")
+                OutputUtils.showError("Invalid choice")
                 continue
             }
 
@@ -53,7 +51,7 @@ final class AppController {
     }
 
     private func showLoginRoleMenu() {
-        consolePrinter.showMenu(UserRole.allCases, title: "Login As")
+        OutputUtils.showMenu(UserRole.allCases, title: "Login As")
 
         guard
             let choice = InputUtils.readMenuChoice(
@@ -94,8 +92,7 @@ final class AppController {
                     currentUserId: user.userId,
                     libraryService: libraryService,
                     userService: userService,
-                    reportService: reportService,
-                    consolePrinter: consolePrinter
+                    reportService: reportService
                 ).start()
 
             case .user:
@@ -103,13 +100,12 @@ final class AppController {
                     currentUserId: user.userId,
                     libraryService: libraryService,
                     userService: userService,
-                    reportService: reportService,
-                    consolePrinter: consolePrinter
+                    reportService: reportService
                 ).start()
             }
 
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
 
         }
     }
@@ -124,7 +120,7 @@ final class AppController {
         let confirm = InputUtils.readPassword("Confirm password")
 
         guard password == confirm else {
-            consolePrinter.showError("Passwords do not match.")
+            OutputUtils.showError("Passwords do not match.")
             return
         }
 
@@ -145,7 +141,7 @@ final class AppController {
             )
 
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
     }
 }

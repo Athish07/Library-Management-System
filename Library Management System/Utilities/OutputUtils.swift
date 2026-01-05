@@ -1,8 +1,8 @@
 import Foundation
 
-final class ConsolePrinter {
+struct OutputUtils {
 
-    func showMenu<T: CaseIterable & RawRepresentable>(
+    static func showMenu<T: CaseIterable & RawRepresentable>(
         _ options: [T],
         title: String
     ) {
@@ -15,12 +15,12 @@ final class ConsolePrinter {
 
         print("")
     }
-    
-    func showError(_ message: String) {
+
+    static func showError(_ message: String) {
         print("\nERROR:\(message)\n")
     }
 
-    func printBookDetails(_ book: Book) {
+    static func printBookDetails(_ book: Book) {
         print(
             """
             Title: \(book.title)
@@ -32,16 +32,17 @@ final class ConsolePrinter {
         print(String(repeating: "==", count: 10))
     }
 
-    func printUserDetails(_ user: User) {
+    static func printUserDetails(_ user: User) {
         print(
             """
             User Details: 
             UserName: \(user.name) 
             Email: \(user.email)
+            PhoneNumber: \(user.phoneNumber)
             Address: \(user.address)
             Role: \(user.role.rawValue)
             """
         )
     }
-    
+
 }

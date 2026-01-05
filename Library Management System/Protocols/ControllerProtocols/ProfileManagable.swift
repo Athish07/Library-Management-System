@@ -3,27 +3,26 @@ import Foundation
 protocol ProfileManagable {
     var userId: UUID { get }
     var userService: UserService { get }
-    var consolePrinter: ConsolePrinter { get }
 }
 
 extension ProfileManagable {
 
     func viewProfile() {
         guard let user = userService.getUserById(userId) else {
-            consolePrinter.showError("Unable to load profile.")
+            OutputUtils.showError("Unable to load profile.")
             return
         }
-        consolePrinter.printUserDetails(user)
+        OutputUtils.printUserDetails(user)
     }
 
     func updateProfile() {
 
         guard let user = userService.getUserById(userId) else {
-            consolePrinter.showError("User not found.")
+            OutputUtils.showError("User not found.")
             return
         }
 
-        consolePrinter.printUserDetails(user)
+        OutputUtils.printUserDetails(user)
 
         print("\n press ENTER if you want to proceed with the same detail. \n")
 
@@ -60,9 +59,9 @@ extension ProfileManagable {
         case .success:
             print("Profile updated successfully.")
         case .noChanges:
-            consolePrinter.showError("No changes detected.")
+            OutputUtils.showError("No changes detected.")
         case .userNotFound:
-            consolePrinter.showError("User not found.")
+            OutputUtils.showError("User not found.")
         }
     }
 }

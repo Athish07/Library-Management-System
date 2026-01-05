@@ -4,7 +4,6 @@ final class LibrarianController: ProfileManagable {
 
     let userId: UUID
     let userService: UserService
-    let consolePrinter: ConsolePrinter
     private let libraryService: LibraryService
     private let reportService: ReportService
 
@@ -13,19 +12,17 @@ final class LibrarianController: ProfileManagable {
         libraryService: LibraryService,
         userService: UserService,
         reportService: ReportService,
-        consolePrinter: ConsolePrinter
     ) {
         self.userId = currentUserId
         self.libraryService = libraryService
         self.userService = userService
         self.reportService = reportService
-        self.consolePrinter = consolePrinter
     }
 
     func start() {
 
         while true {
-            consolePrinter.showMenu(
+            OutputUtils.showMenu(
                 LibrarianMenu.allCases,
                 title: "LIBRARIAN MENU"
             )
@@ -35,7 +32,7 @@ final class LibrarianController: ProfileManagable {
                     from: LibrarianMenu.allCases
                 )
             else {
-                consolePrinter.showError("Invalid choice")
+                OutputUtils.showError("Invalid choice")
                 continue
             }
 
@@ -66,7 +63,7 @@ final class LibrarianController: ProfileManagable {
         let title = InputUtils.readString("Enter book title")
         let author = InputUtils.readString("Enter author name")
 
-        consolePrinter
+        OutputUtils
             .showMenu(BookCategory.allCases, title: "Available categories.")
 
         guard
@@ -84,7 +81,7 @@ final class LibrarianController: ProfileManagable {
                 allowCancel: false
             ), copies > 0
         else {
-            consolePrinter.showError("Number of copies must be greater than 0")
+            OutputUtils.showError("Number of copies must be greater than 0")
             return
         }
 
@@ -97,7 +94,7 @@ final class LibrarianController: ProfileManagable {
             )
             print("Book '\(title)' added successfully with \(copies) copies!")
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
     }
 
@@ -112,26 +109,24 @@ final class LibrarianController: ProfileManagable {
 
         for (index, book) in books.enumerated() {
             print("\(index + 1).", terminator: "")
-            consolePrinter.printBookDetails(book)
+            OutputUtils.printBookDetails(book)
         }
 
         guard
-            let index = InputUtils.readValidIndex(
-                from: books.count,
+            let selectedBook = InputUtils.readMenuChoice(
+                from: books,
                 prompt:
-                    "Enter book number to remove (or press Enter to cancel)"
+                    "Enter book number to remove (or press ENTER to move back)"
             )
         else {
             return
         }
 
-        let selectedBook = books[index]
-        
         do {
             try libraryService.removeBook(bookId: selectedBook.bookId)
             print("Book '\(selectedBook.title)' removed successfully.")
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
     }
 
@@ -151,7 +146,7 @@ final class LibrarianController: ProfileManagable {
                 let book = try libraryService.getBook(bookId: request.bookId)
 
                 print("\(index + 1).")
-                consolePrinter.printBookDetails(book)
+                OutputUtils.printBookDetails(book)
 
                 print(
                     "Request Date: \(request.requestDate.formatted)"
@@ -161,23 +156,21 @@ final class LibrarianController: ProfileManagable {
                 )
                 print("---")
             } catch {
-                consolePrinter.showError(error.localizedDescription)
+                OutputUtils.showError(error.localizedDescription)
             }
         }
-        
+
         guard
-            let choice = InputUtils.readValidIndex(
-                from: requests.count,
+            let selected = InputUtils.readMenuChoice(
+                from: requests,
                 prompt:
                     "Enter request number to manage (or press Enter to go back)"
             )
         else {
             return
         }
-        
-        let selected = requests[choice]
-        
-        consolePrinter.showMenu(
+
+        OutputUtils.showMenu(
             BorrowRequestAction.allCases,
             title: "Manage Borrow Request"
         )
@@ -224,22 +217,22 @@ final class LibrarianController: ProfileManagable {
         }
 
         guard
-            let index = InputUtils.readValidIndex(
-                from: books.count,
-                prompt: "Select book number (Press Enter to cancel)"
+            let selectedBook = InputUtils.readMenuChoice(
+                from: books,
+                prompt: "Select book number (Press ENTER to move back)"
             )
         else { return }
-        
+
         do {
             let history = try reportService.getIssuedBookHistory(
-                bookId: books[index - 1].bookId
+                bookId: selectedBook.bookId
             )
 
             if history.isEmpty {
                 print("No history found for this book.")
                 return
             }
-            
+
             for record in history {
                 print(
                     """
@@ -252,7 +245,7 @@ final class LibrarianController: ProfileManagable {
                 )
             }
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
     }
 
@@ -302,7 +295,7 @@ final class LibrarianController: ProfileManagable {
                     )
 
                 } catch {
-                    consolePrinter.showError(error.localizedDescription)
+                    OutputUtils.showError(error.localizedDescription)
                 }
             }
         }

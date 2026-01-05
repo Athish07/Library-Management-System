@@ -1,7 +1,7 @@
 import Foundation
 
 struct User: Equatable {
-
+    
     let userId: UUID
     var name: String
     var email: String

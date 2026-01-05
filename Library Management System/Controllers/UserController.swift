@@ -3,7 +3,6 @@ import Foundation
 final class UserController: ProfileManagable {
     let userId: UUID
     let userService: UserService
-    let consolePrinter: ConsolePrinter
     private let libraryService: LibraryService
     private let reportService: ReportService
 
@@ -11,29 +10,26 @@ final class UserController: ProfileManagable {
         currentUserId: UUID,
         libraryService: LibraryService,
         userService: UserService,
-        reportService: ReportService,
-        consolePrinter: ConsolePrinter
+        reportService: ReportService
     ) {
         self.userId = currentUserId
         self.libraryService = libraryService
         self.userService = userService
         self.reportService = reportService
-        self.consolePrinter = consolePrinter
-        
     }
 
     func start() {
 
         while true {
 
-            consolePrinter.showMenu(UserMenuOption.allCases, title: "USER MENU")
+            OutputUtils.showMenu(UserMenuOption.allCases, title: "USER MENU")
 
             guard
                 let choice = InputUtils.readMenuChoice(
                     from: UserMenuOption.allCases,
                 )
             else {
-                consolePrinter.showError("Invalid choice")
+                OutputUtils.showError("Invalid choice")
                 continue
             }
 
@@ -67,7 +63,7 @@ final class UserController: ProfileManagable {
         } else {
             print(" Search Results (\(results.count) found):")
             for book in results {
-                consolePrinter.printBookDetails(book)
+                OutputUtils.printBookDetails(book)
             }
         }
     }
@@ -81,7 +77,7 @@ final class UserController: ProfileManagable {
         } else {
             print(" Available Books (\(books.count)):")
             for book in books {
-                consolePrinter.printBookDetails(book)
+                OutputUtils.printBookDetails(book)
             }
         }
     }
@@ -98,7 +94,7 @@ final class UserController: ProfileManagable {
             for issued in borrowed {
                 do {
                     let book = try libraryService.getBook(bookId: issued.bookId)
-                    consolePrinter.printBookDetails(book)
+                    OutputUtils.printBookDetails(book)
                     print("   Issued: \((issued.issueDate))")
                     print("   Due: \(issued.dueDate.formatted)")
                     if issued.isOverdue {
@@ -107,7 +103,7 @@ final class UserController: ProfileManagable {
                     }
                     print(String(repeating: "===", count: 10))
                 } catch {
-                    consolePrinter.showError(error.localizedDescription)
+                    OutputUtils.showError(error.localizedDescription)
                 }
             }
         }
@@ -148,21 +144,19 @@ final class UserController: ProfileManagable {
         
         for (index, book) in books.enumerated() {
             print("\(index + 1). ", terminator: "")
-            consolePrinter.printBookDetails(book)
+            OutputUtils.printBookDetails(book)
         }
 
         guard
-            let index = InputUtils.readValidIndex(
-                from: books.count,
+            let selectedBook = InputUtils.readMenuChoice(
+                from: books,
                 prompt:
-                    "Enter book number to request (or press Enter to cancel)"
+                    "Enter book number to request (or press ENTER to move back)"
             )
         else {
             return
         }
-
-        let selectedBook = books[index]
-
+        
         do {
             try libraryService.requestBorrow(
                 bookId: selectedBook.bookId,
@@ -172,7 +166,7 @@ final class UserController: ProfileManagable {
                 " Borrow request sent for '\(selectedBook.title)'!\nLibrarian will review it soon."
             )
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
     }
 
@@ -190,7 +184,7 @@ final class UserController: ProfileManagable {
                 "Book renewed Successfully extended till \(updatedIssueBook.dueDate)"
             )
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
 
     }
@@ -214,7 +208,7 @@ final class UserController: ProfileManagable {
                 print("Book returned successfully! No fine. Thank you!")
             }
         } catch {
-            consolePrinter.showError(error.localizedDescription)
+            OutputUtils.showError(error.localizedDescription)
         }
 
     }
@@ -227,7 +221,8 @@ extension UserController {
         let borrowed = libraryService.getBorrowedBooks(for: userId)
         
         if borrowed.isEmpty {
-            consolePrinter.showError("No book available.")
+            OutputUtils.showError("No book available.")
+            return nil
         }
         print("Your Borrowed Books:")
         
@@ -236,27 +231,27 @@ extension UserController {
                 let book = try libraryService.getBook(bookId: issued.bookId)
                 
                 print("\(index + 1). ", terminator: "")
-                consolePrinter.printBookDetails(book)
+                OutputUtils.printBookDetails(book)
                 
                 print(
                     " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"
                 )
             } catch {
-                consolePrinter.showError(error.localizedDescription)
+                OutputUtils.showError(error.localizedDescription)
             }
         }
         
         guard
-            let index = InputUtils.readValidIndex(
-                from: borrowed.count,
+            let selectedBook = InputUtils.readMenuChoice(
+                from: borrowed,
                 prompt:
-                    "Enter book number to request (or press Enter to cancel)"
+                    "Enter book number to request (or press ENTER to move back)"
             )
         else {
             return nil
         }
-
-        return borrowed[index]
+        
+        return selectedBook
         
     }
     

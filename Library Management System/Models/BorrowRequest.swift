@@ -40,4 +40,3 @@ extension BorrowRequest {
 
 }
 
-typealias RequestStatus = BorrowRequest.RequestStatus

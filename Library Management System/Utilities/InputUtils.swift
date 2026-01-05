@@ -116,32 +116,14 @@ struct InputUtils {
         } ?? ""
     }
 
-    static func readValidIndex(
-        from count: Int,
-        prompt: String
-    ) -> Int? {
-
-        while true {
-
-            guard let input = InputUtils.readInt(prompt, allowCancel: true)
-            else {
-                print("Operation cancelled.")
-                return nil
-            }
-
-            guard (1...count).contains(input) else {
-                print("Invalid choice. Please enter a valid number")
-                continue
-            }
-
-            return input - 1
-        }
-    }
-    
     static func readMenuChoice<T>(
         from options: [T],
         prompt: String = "Enter your choice"
     ) -> T? {
+
+        guard !options.isEmpty else {
+            return nil
+        }
 
         let max = options.count
 

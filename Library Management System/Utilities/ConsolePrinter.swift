@@ -15,10 +15,7 @@ final class ConsolePrinter {
 
         print("")
     }
-
-    func displayNumberedBooks() {
-        
-    }
+    
     func showError(_ message: String) {
         print("\nERROR:\(message)\n")
     }

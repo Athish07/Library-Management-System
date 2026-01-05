@@ -235,8 +235,8 @@ extension UserController {
             do {
                 let book = try libraryService.getBook(bookId: issued.bookId)
                 
-//                print("\(index + 1). ", terminator: "")
-//                consolePrinter.printBookDetails(book)
+                print("\(index + 1). ", terminator: "")
+                consolePrinter.printBookDetails(book)
                 
                 print(
                     " Due: \(issued.dueDate.formatted) \(issued.isOverdue ? "OVERDUE" : "")"

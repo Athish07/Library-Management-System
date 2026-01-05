@@ -220,7 +220,7 @@ final class LibrarianController: ProfileManagable {
         }
 
         for (index, book) in books.enumerated() {
-            print("\(index + 1). \(book.title)")
+            print("\(index + 1). \(book.title) , Author: \(book.author)")
         }
 
         guard
@@ -239,7 +239,7 @@ final class LibrarianController: ProfileManagable {
                 print("No history found for this book.")
                 return
             }
-
+            
             for record in history {
                 print(
                     """

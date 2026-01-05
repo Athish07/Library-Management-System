@@ -79,7 +79,7 @@ final class AppController {
         let password = InputUtils.readPassword("Enter Password")
 
         do {
-            
+
             let user = try authenticationService.login(
                 email: email,
                 password: password,
@@ -88,6 +88,7 @@ final class AppController {
             print("Login successful! Welcome, \(user.name).")
 
             switch role {
+    
             case .librarian:
                 LibrarianController(
                     currentUserId: user.userId,

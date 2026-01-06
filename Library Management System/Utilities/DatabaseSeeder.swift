@@ -12,7 +12,7 @@ struct DatabaseSeeder {
     }
 
     private static func seedDemoUsers(using userRepository: UserRepository) {
-        if userRepository.findByEmail("athish@gmail.com") == nil {
+        if userRepository.findByEmail("librarian@gmail.com") == nil  {
             let librarian = User(
                 name: "Head Librarian",
                 email: "librarian@gmail.com",
@@ -21,6 +21,7 @@ struct DatabaseSeeder {
                 address: "Main Library Building",
                 role: .librarian
             )
+            
             userRepository.save(librarian)
         }
 

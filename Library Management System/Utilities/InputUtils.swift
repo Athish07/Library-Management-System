@@ -1,142 +1,141 @@
 import Foundation
 
 struct InputUtils {
-
-    private static func read<T>(
-        prompt: String,
-        allowCancel: Bool,
-        validation: (String) -> (T?, String?)
-    ) -> T? {
-
-        while true {
-            print(prompt, terminator: ": ")
-
-            guard let rawInput = readLine() else {
-                continue
-            }
-
-            let trimmed = rawInput.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
-
-            if trimmed.isEmpty, allowCancel {
-                return nil
-            }
-
-            let (value, errorMessage) = validation(trimmed)
-
-            if let value = value {
-                return value
-            }
-
-            if let error = errorMessage {
-                print("\n\(error)\n")
-            } else {
-                print("Invalid input. Please try again.\n")
-            }
-        }
+    
+    private static func read(
+        prompt: String
+    ) -> String {
+        
+        print(prompt, terminator: ": ")
+        let rawInput = readLine()
+        
+        return rawInput?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        ) ?? ""
+        
     }
-
+    
     static func readInt(
         _ prompt: String,
-        allowCancel: Bool = true
+        allowEmpty: Bool = true
     ) -> Int? {
-        read(
-            prompt: prompt,
-            allowCancel: allowCancel,
-            validation: { input in
-                if let int = Int(input) {
-                    return (int, nil)
-                }
-                return (nil, "Please enter a valid number.")
+        
+        while true {
+            
+            let input = read(prompt: prompt)
+            
+            if input.isEmpty, allowEmpty {
+                return nil
             }
-        )
+            
+            if let number = Int(input) {
+                return number
+            }
+            
+            print("Invalid integer value. Please try again.")
+        }
     }
-
+    
     static func readString(
         _ prompt: String,
         allowEmpty: Bool = false
     ) -> String {
-        read(
-            prompt: prompt,
-            allowCancel: allowEmpty,
-            validation: { input in
-                if allowEmpty || !input.isEmpty {
-                    return (input, nil)
-                }
-                return (nil, "This field cannot be empty.")
-            }
-        ) ?? ""
-    }
 
+        while true {
+            
+            let input = read(prompt: prompt)
+            
+            if input.isEmpty, !allowEmpty {
+                print("Input cannot be empty. Please try again.")
+                continue
+            }
+            
+            return input
+        }
+    }
+    
     static func readEmail(
         _ prompt: String,
         allowEmpty: Bool = false
     ) -> String {
-        read(
-            prompt: prompt,
-            allowCancel: allowEmpty,
-            validation: { input in
-                switch input.emailValidation {
-                case .valid: return (input, nil)
-                case .invalid(let reason): return (nil, reason)
-                }
+        
+        while true {
+            
+            let input = read(prompt: prompt)
+            
+            if (input.isEmpty && allowEmpty) || input.emailValidation {
+                return input
             }
-        ) ?? ""
+            print("Invalid Email format")
+        }
+        
     }
-
+    
     static func readPhoneNumber(
         _ prompt: String,
         allowEmpty: Bool = false
     ) -> String {
-        read(
-            prompt: prompt,
-            allowCancel: allowEmpty,
-            validation: { input in
-                switch input.phoneValidation {
-                case .valid:
-                    return (input, nil)
-                case .invalid(let reason):
-                    return (nil, reason)
-                }
+        
+        while true {
+            
+            let input = read(prompt: prompt)
+            
+            if (input.isEmpty && allowEmpty) || input.phoneValidation {
+                return input
             }
-        ) ?? ""
+            
+            print("Invalid PhoneNumber")
+        }
     }
-
+    
     static func readPassword(
-        _ prompt: String
+        _ prompt: String,
+        allowEmpty: Bool = false
     ) -> String {
-        read(prompt: prompt, allowCancel: false) { input in
-            switch input.passwordValidation {
-            case .valid:
-                return (input, nil)
-            case .invalid(let reason):
-                return (nil, reason)
-            }
-        } ?? ""
-    }
+        
+        while true {
 
+            let input = read(prompt: prompt)
+
+            if (input.isEmpty && allowEmpty) || input.passwordValidation {
+                return input
+            }
+
+            print(
+                """
+                Password must contain:
+                • At least 8 characters
+                • One uppercase letter
+                • One lowercase letter
+                • One number
+                """
+        
+            )
+        }
+        
+    }
+    
     static func readMenuChoice<T>(
         from options: [T],
         prompt: String = "Enter your choice"
     ) -> T? {
-
+        
         guard !options.isEmpty else {
             return nil
         }
-
+        
         let max = options.count
-
+        
         while true {
-
-            guard let index = readInt(prompt, allowCancel: true) else {
+            
+            guard let index = readInt(prompt, allowEmpty: true) else {
                 return nil
             }
-
+            
             if (1...max).contains(index) {
                 return options[index - 1]
             }
-
+            
             print("Invalid choice. Please try again.\n")
         }
     }

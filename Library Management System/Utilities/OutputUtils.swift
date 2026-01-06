@@ -30,23 +30,19 @@ struct OutputUtils {
         )
     }
 
-    static func showSearchResults(
+    static func printBookQuantity(
         _ results: [(book: Book, inventory: BookQuantity)]
     ) {
 
         for (index, result) in results.enumerated() {
+            print("\(index + 1).")
+            printBookDetails(result.book)
             print(
-                """
-                \(index + 1).Title      : \(result.book.title)
-                  Author     : \(result.book.author)
-                  Category   : \(result.book.category.rawValue)
-                  Available  : \(result.inventory.availableCopies)/\(result.inventory.totalCopies)
-                 \n
-                """
+                "Available : \(result.inventory.availableCopies)/\(result.inventory.totalCopies)\n"
             )
         }
     }
-
+    
     static func printAccountDetails(_ user: User) {
         print(
             """

@@ -1,47 +1,34 @@
 import Foundation
 
 extension String {
-
-    enum ValidationResult {
-        case valid
-        case invalid(reason: String)
-    }
-
-    var emailValidation: ValidationResult {
+    
+    var emailValidation: Bool {
         let pattern =
             #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
 
         if range(of: pattern, options: .regularExpression) != nil {
-            return .valid
+            return true
         }
-        return .invalid(reason: "Invalid email format.")
+        return false
     }
 
-    var phoneValidation: ValidationResult {
+    var phoneValidation: Bool {
         let pattern = #"^[0-9]{10}$"#
 
         if range(of: pattern, options: .regularExpression) != nil {
-            return .valid
+            return true
         }
-        return .invalid(reason: "Phone number must be exactly 10 digits.")
+        return false
     }
 
-    var passwordValidation: ValidationResult {
+    var passwordValidation: Bool {
         let pattern =
             #"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"#
 
         if range(of: pattern, options: .regularExpression) != nil {
-            return .valid
+            return true
         }
-
-        return .invalid(
-            reason: """
-                Password must contain:
-                • At least 8 characters
-                • One uppercase letter
-                • One lowercase letter
-                • One number
-                """
-        )
+        
+        return false
     }
 }

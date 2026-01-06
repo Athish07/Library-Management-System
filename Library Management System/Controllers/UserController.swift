@@ -63,7 +63,7 @@ final class UserController: ProfileManagable {
         }
 
         print("Search Results (\(results.count) found):")
-        OutputUtils.showSearchResults(results)
+        OutputUtils.printBookQuantity(results)
         
         guard let selected = InputUtils.readMenuChoice(
             from: results,
@@ -84,7 +84,7 @@ final class UserController: ProfileManagable {
             print(" No books are currently available.")
         } else {
             print(" Available Books (\(results.count)):")
-            OutputUtils.showSearchResults(results)
+            OutputUtils.printBookQuantity(results)
         }
         
         print(

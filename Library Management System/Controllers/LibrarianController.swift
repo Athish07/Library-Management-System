@@ -78,7 +78,7 @@ final class LibrarianController: ProfileManagable {
         guard
             let copies = InputUtils.readInt(
                 "Enter number of copies",
-                allowCancel: false
+                allowEmpty: false
             ), copies > 0
         else {
             OutputUtils.showError("Number of copies must be greater than 0")

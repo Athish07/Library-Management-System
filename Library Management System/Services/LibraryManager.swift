@@ -52,7 +52,7 @@ final class LibraryManager: LibraryService {
         return books.compactMap { book in
             guard let inventory =
                     bookInventoryRepository.findByBookId(book.id),
-                  inventory.availableCopies > 0
+                  inventory.isAvailable
             else {
                 return nil
             }
@@ -68,7 +68,7 @@ final class LibraryManager: LibraryService {
         }
 
         guard let inventory = bookInventoryRepository.findByBookId(bookId),
-              inventory.availableCopies > 0
+              inventory.isAvailable 
         else {
             throw LibraryError.bookUnavailable
         }

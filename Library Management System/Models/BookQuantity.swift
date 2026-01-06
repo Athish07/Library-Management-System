@@ -29,4 +29,7 @@ struct BookQuantity {
         availableCopies += 1
     }
     
+    var isAvailable: Bool {
+        return availableCopies > 0
+    }
 }

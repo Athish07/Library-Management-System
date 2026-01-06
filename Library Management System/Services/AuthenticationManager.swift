@@ -16,7 +16,7 @@ final class AuthenticationManager: AuthenticationService {
     func login(email: String, password: String, role: UserRole) throws
         -> Account
     {
-
+        
         switch role {
 
         case .user:
@@ -75,7 +75,7 @@ extension AuthenticationManager {
         case invalidPassword
         case userAlreadyExists
         case unauthorizedAccess
-
+        
         var errorDescription: String? {
             switch self {
             case .userNotFound:

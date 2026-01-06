@@ -77,18 +77,19 @@ final class AppController {
 
         do {
 
-            let user = try authenticationService.login(
+            let account = try authenticationService.login(
                 email: email,
                 password: password,
                 role: role
             )
-            print("Login successful! Welcome, \(user.name).")
+            
+            print("Login successful! Welcome, \(account.name).")
 
             switch role {
 
             case .librarian:
                 LibrarianController(
-                    currentUserId: user.id,
+                    currentUserId: account.id,
                     libraryService: libraryService,
                     userService: userService,
                     reportService: reportService
@@ -96,7 +97,7 @@ final class AppController {
 
             case .user:
                 UserController(
-                    currentUserId: user.id,
+                    currentUserId: account.id,
                     libraryService: libraryService,
                     userService: userService,
                     reportService: reportService

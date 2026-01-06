@@ -1,14 +1,14 @@
 import Foundation
 
-struct User: Equatable, Account {
-    
+struct Librarian: Account {
+
     let id: UUID
     var name: String
     var email: String
     var password: String
     var phoneNumber: String
     var address: String
-    
+
     init(
         id: UUID = UUID(),
         name: String,
@@ -24,5 +24,5 @@ struct User: Equatable, Account {
         self.phoneNumber = phoneNumber
         self.address = address
     }
-    
+
 }

@@ -34,9 +34,7 @@ final class UserManager: UserService {
 
             address: updatedUser.address.isEmpty
                 ? existingUser.address
-                : updatedUser.address,
-
-            role: existingUser.role
+                : updatedUser.address
         )
 
         guard mergedUser != existingUser else {
@@ -50,4 +48,5 @@ final class UserManager: UserService {
     func getUserById(_ userId: UUID) -> User? {
         userRepository.findById(userId)
     }
+    
 }

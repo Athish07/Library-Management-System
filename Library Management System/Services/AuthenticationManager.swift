@@ -3,26 +3,43 @@ import Foundation
 final class AuthenticationManager: AuthenticationService {
 
     private let userRepository: UserRepository
+    private let librarianRepository: LibrarianRepository
 
-    init(userRepository: UserRepository) {
+    init(
+        userRepository: UserRepository,
+        librarianRepository: LibrarianRepository
+    ) {
         self.userRepository = userRepository
+        self.librarianRepository = librarianRepository
     }
 
-    func login(email: String, password: String, role: UserRole) throws -> User {
+    func login(email: String, password: String, role: UserRole) throws
+        -> Account
+    {
 
-        guard let user = userRepository.findByEmail(email) else {
-            throw AuthenticationError.userNotFound
+        switch role {
+
+        case .user:
+            guard let user = userRepository.findByEmail(email) else {
+                throw AuthenticationError.userNotFound
+            }
+
+            guard password == user.password else {
+                throw AuthenticationError.invalidPassword
+            }
+            return user
+
+        case .librarian:
+            guard let librarian = librarianRepository.findByEmail(email) else {
+                throw AuthenticationError.userNotFound
+            }
+
+            guard password == librarian.password else {
+                throw AuthenticationError.invalidPassword
+            }
+            return librarian
         }
-
-        guard password == user.password else {
-            throw AuthenticationError.invalidPassword
-        }
-
-        guard user.role == role else {
-            throw AuthenticationError.unauthorizedAccess
-        }
-
-        return user
+        
     }
 
     func register(
@@ -42,10 +59,9 @@ final class AuthenticationManager: AuthenticationService {
             email: email,
             password: password,
             phoneNumber: phoneNumber,
-            address: address,
-            role: .user
+            address: address
         )
-        
+
         userRepository.save(user)
     }
 

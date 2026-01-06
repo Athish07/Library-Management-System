@@ -12,7 +12,7 @@ extension ProfileManagable {
             OutputUtils.showError("Unable to load profile.")
             return
         }
-        OutputUtils.printUserDetails(user)
+        OutputUtils.printAccountDetails(user)
     }
 
     func updateProfile() {
@@ -22,7 +22,7 @@ extension ProfileManagable {
             return
         }
 
-        OutputUtils.printUserDetails(user)
+        OutputUtils.printAccountDetails(user)
 
         print("\n press ENTER if you want to proceed with the same detail. \n")
 
@@ -49,8 +49,7 @@ extension ProfileManagable {
             email: email,
             password: user.password,
             phoneNumber: phoneNumber,
-            address: address,
-            role: user.role
+            address: address
         )
 
         let result = userService.updateProfile(updatedUser)

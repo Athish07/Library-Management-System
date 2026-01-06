@@ -4,25 +4,25 @@ struct DatabaseSeeder {
 
     static func seedIfNeeded(
         userRepository: UserRepository,
+        librarianRepository: LibrarianRepository,
         bookRepository: BookRepository,
         bookInventoryRepository: BookInventoryRepository
     ) {
-        seedDemoUsers(using: userRepository)
-        seedDemoBooks(bookRepository: bookRepository, bookInventoryRepository: bookInventoryRepository)
+        seedDemoUsers(userRepository, librarianRepository)
+        seedDemoBooks(bookRepository, bookInventoryRepository)
     }
 
-    private static func seedDemoUsers(using userRepository: UserRepository) {
-        if userRepository.findByEmail("librarian@gmail.com") == nil  {
-            let librarian = User(
+    private static func seedDemoUsers(_ userRepository: UserRepository, _ librarianRepository: LibrarianRepository) {
+        
+        if librarianRepository.findByEmail("librarian@gmail.com") == nil  {
+            let librarian = Librarian(
                 name: "Head Librarian",
                 email: "librarian@gmail.com",
                 password: "Athish_07",
                 phoneNumber: "8148847642",
                 address: "Main Library Building",
-                role: .librarian
             )
-            
-            userRepository.save(librarian)
+            librarianRepository.save(librarian)
         }
 
         if userRepository.findByEmail("user@gmail.com") == nil {
@@ -32,15 +32,14 @@ struct DatabaseSeeder {
                 password: "Athish_07",
                 phoneNumber: "7904411578",
                 address: "123 Test Street",
-                role: .user
             )
             userRepository.save(testUser)
         }
     }
 
     private static func seedDemoBooks(
-        bookRepository: BookRepository,
-        bookInventoryRepository: BookInventoryRepository
+        _ bookRepository: BookRepository,
+        _ bookInventoryRepository: BookInventoryRepository
     ) {
         guard bookRepository.getAllBooks().isEmpty else { return }
 

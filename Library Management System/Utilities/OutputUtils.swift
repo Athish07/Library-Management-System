@@ -47,7 +47,7 @@ struct OutputUtils {
         }
     }
 
-    static func printUserDetails(_ user: User) {
+    static func printAccountDetails(_ user: User) {
         print(
             """
             User Details: 
@@ -55,7 +55,6 @@ struct OutputUtils {
             Email: \(user.email)
             PhoneNumber: \(user.phoneNumber)
             Address: \(user.address)
-            Role: \(user.role.rawValue)
             """
         )
     }

@@ -2,7 +2,7 @@ import Foundation
 
 protocol LibraryService {
 
-    typealias BookWithInventory = (book: Book, inventory: BookInventory)
+    typealias BookWithInventory = (book: Book, inventory: BookQuantity)
     
     func search(by query: String) -> [BookWithInventory]
     func getAvailableBooks() -> [BookWithInventory]

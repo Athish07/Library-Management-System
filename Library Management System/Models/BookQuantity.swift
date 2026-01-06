@@ -1,6 +1,6 @@
 import Foundation
 
-struct BookInventory {
+struct BookQuantity {
     
     let bookId: UUID
     private(set) var totalCopies: Int

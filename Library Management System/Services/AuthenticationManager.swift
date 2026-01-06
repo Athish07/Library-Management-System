@@ -69,7 +69,7 @@ final class AuthenticationManager: AuthenticationService {
 
 extension AuthenticationManager {
 
-    enum AuthenticationError: Error, LocalizedError {
+    enum AuthenticationError: LocalizedError {
 
         case userNotFound
         case invalidPassword

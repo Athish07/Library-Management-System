@@ -112,7 +112,7 @@ struct DatabaseSeeder {
         for (book, copies) in demoBooks {
             bookRepository.save(book)
             
-            let inventory = BookInventory(
+            let inventory = BookQuantity(
                 bookId: book.id,
                 totalCopies: copies
             )

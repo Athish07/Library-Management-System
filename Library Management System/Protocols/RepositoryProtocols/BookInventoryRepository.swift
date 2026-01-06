@@ -1,8 +1,8 @@
 import Foundation
 
 protocol BookInventoryRepository {
-    func save(_ inventory: BookInventory)
-    func findByBookId(_ bookId: UUID) -> BookInventory?
+    func save(_ inventory: BookQuantity)
+    func findByBookId(_ bookId: UUID) -> BookQuantity?
     func remove(bookId: UUID)
-    func getAll() -> [BookInventory]
+    func getAll() -> [BookQuantity]
 }

@@ -150,8 +150,7 @@ extension AppController {
 
     enum MainMenu: String, CaseIterable {
         case login = "Login"
-        case register = "Register"
+        case register = "Register (only for user)"
         case exit = "Exit"
-
     }
 }

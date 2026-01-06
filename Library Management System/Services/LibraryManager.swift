@@ -179,7 +179,7 @@ final class LibraryManager: LibraryService {
 
             bookRepository.save(book)
 
-            let inventory = BookInventory(
+            let inventory = BookQuantity(
                 bookId: book.id,
                 totalCopies: copiesToAdd
             )
@@ -279,8 +279,8 @@ final class LibraryManager: LibraryService {
 }
 
 extension LibraryManager {
-
-    enum LibraryError: Error, LocalizedError {
+    
+    enum LibraryError: LocalizedError {
         case bookNotFound
         case bookUnavailable
         case duplicateBorrowRequest

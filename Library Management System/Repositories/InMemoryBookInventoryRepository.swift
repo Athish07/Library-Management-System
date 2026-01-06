@@ -2,13 +2,13 @@ import Foundation
 
 final class InMemoryBookInventoryRepository: BookInventoryRepository {
 
-    private var inventories: [UUID: BookInventory] = [:]
+    private var inventories: [UUID: BookQuantity] = [:]
 
-    func save(_ inventory: BookInventory) {
+    func save(_ inventory: BookQuantity) {
         inventories[inventory.bookId] = inventory
     }
 
-    func findByBookId(_ bookId: UUID) -> BookInventory? {
+    func findByBookId(_ bookId: UUID) -> BookQuantity? {
         inventories[bookId]
     }
 
@@ -16,7 +16,7 @@ final class InMemoryBookInventoryRepository: BookInventoryRepository {
         inventories.removeValue(forKey: bookId)
     }
 
-    func getAll() -> [BookInventory] {
+    func getAll() -> [BookQuantity] {
         Array(inventories.values)
     }
     

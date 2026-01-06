@@ -31,7 +31,7 @@ struct OutputUtils {
     }
 
     static func showSearchResults(
-        _ results: [(book: Book, inventory: BookInventory)]
+        _ results: [(book: Book, inventory: BookQuantity)]
     ) {
 
         for (index, result) in results.enumerated() {

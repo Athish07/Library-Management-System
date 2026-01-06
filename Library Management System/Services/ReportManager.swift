@@ -87,7 +87,7 @@ final class ReportManager: ReportService {
 
 extension ReportManager {
 
-    enum ReportError: Error, LocalizedError {
+    enum ReportError: LocalizedError {
         case bookNotFound
         case userNotFound
 

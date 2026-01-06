@@ -5,7 +5,7 @@ final class LibraryManager: LibraryService {
     private let bookRepository: BookRepository
     private let borrowRequestRepository: BorrowRequestRepository
     private let issuedBookRepository: IssuedBookRepository
-    private let inventoryRepository: InventoryRepository
+    private let bookInventoryRepository: BookInventoryRepository
     private let finePerDay: Double = 1.0
     private let dueInDays: Int = 14
     private let extensionDays: Int = 7
@@ -14,42 +14,50 @@ final class LibraryManager: LibraryService {
         bookRepository: BookRepository,
         borrowRequestRepository: BorrowRequestRepository,
         issuedBookRepository: IssuedBookRepository,
-        inventoryRepository: InventoryRepository
+        bookInventoryRepository: BookInventoryRepository
     ) {
         self.bookRepository = bookRepository
         self.borrowRequestRepository = borrowRequestRepository
         self.issuedBookRepository = issuedBookRepository
-        self.inventoryRepository = inventoryRepository
-    }
-
-    func search(by query: String) -> [Book] {
-
-        let lowerQuery = query.lowercased().trimmingCharacters(in: .whitespaces)
-
-        guard !lowerQuery.isEmpty else {
-            return bookRepository.getAllBooks()
-        }
-
-        return bookRepository.getAllBooks()
-            .filter { book in
-                book.title.lowercased().contains(lowerQuery)
-                    || book.author.lowercased().contains(lowerQuery)
-                    || book.category.rawValue.lowercased().contains(lowerQuery)
-            }
-            .sorted { $0.title.lowercased() < $1.title.lowercased() }
+        self.bookInventoryRepository = bookInventoryRepository
     }
     
-    func getAvailableBooks() -> [Book] {
+    func search(by query: String) -> [BookWithInventory] {
+
+        let normalized = query
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let books = normalized.isEmpty
+            ? bookRepository.getAllBooks()
+            : bookRepository.getAllBooks().filter {
+                $0.title.lowercased().contains(normalized)
+                || $0.author.lowercased().contains(normalized)
+                || $0.category.rawValue.lowercased().contains(normalized)
+            }
+
+        return books.compactMap { book in
+            guard let inventory =
+                bookInventoryRepository.findByBookId(book.id)
+            else { return nil }
+
+            return (book: book, inventory: inventory)
+        }
+    }
+    
+    func getAvailableBooks() -> [BookWithInventory] {
 
         let books = bookRepository.getAllBooks()
 
-        return books.filter { book in
+        return books.compactMap { book in
             guard let inventory =
-                    inventoryRepository.findByBookId(book.id)
+                    bookInventoryRepository.findByBookId(book.id),
+                  inventory.availableCopies > 0
             else {
-                return false
+                return nil
             }
-            return inventory.availableCopies > 0
+
+            return (book: book, inventory: inventory)
         }
     }
     
@@ -59,7 +67,7 @@ final class LibraryManager: LibraryService {
             throw LibraryError.bookNotFound
         }
 
-        guard let inventory = inventoryRepository.findByBookId(bookId),
+        guard let inventory = bookInventoryRepository.findByBookId(bookId),
               inventory.availableCopies > 0
         else {
             throw LibraryError.bookUnavailable
@@ -79,7 +87,7 @@ final class LibraryManager: LibraryService {
     }
     
     func getBorrowedBooks(for userId: UUID) -> [IssuedBook] {
-        issuedBookRepository.getAllIssuedBooks().filter { $0.userId == userId }
+        issuedBookRepository.getAllIssuedBooks().filter { $0.userId == userId && $0.returnDate == nil }
     }
     
     func returnBook(issueId: UUID, on returnDate: Date) throws -> Double {
@@ -102,11 +110,11 @@ final class LibraryManager: LibraryService {
         issued.applyFine(fine)
 
         guard var inventory =
-                inventoryRepository.findByBookId(issued.bookId)
+                bookInventoryRepository.findByBookId(issued.bookId)
         else { return fine }
 
         inventory.returnCopy()
-        inventoryRepository.save(inventory)
+        bookInventoryRepository.save(inventory)
 
         issuedBookRepository.save(issued)
         return fine
@@ -155,11 +163,11 @@ final class LibraryManager: LibraryService {
         }) {
 
             guard var inventory =
-                    inventoryRepository.findByBookId(existing.id)
+                    bookInventoryRepository.findByBookId(existing.id)
             else { return }
 
             inventory.addCopies(copiesToAdd)
-            inventoryRepository.save(inventory)
+            bookInventoryRepository.save(inventory)
 
         } else {
 
@@ -176,7 +184,7 @@ final class LibraryManager: LibraryService {
                 totalCopies: copiesToAdd
             )
 
-            inventoryRepository.save(inventory)
+            bookInventoryRepository.save(inventory)
         }
     }
 
@@ -225,13 +233,13 @@ final class LibraryManager: LibraryService {
         }
 
         guard var inventory =
-                inventoryRepository.findByBookId(request.bookId),
+                bookInventoryRepository.findByBookId(request.bookId),
               inventory.issueCopy()
         else {
             throw LibraryError.bookUnavailable
         }
 
-        inventoryRepository.save(inventory)
+        bookInventoryRepository.save(inventory)
 
         let issueDate = Date()
         let dueDate = Calendar.current.date(

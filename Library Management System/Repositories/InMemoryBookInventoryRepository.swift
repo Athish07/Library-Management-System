@@ -1,6 +1,6 @@
 import Foundation
 
-final class InMemoryInventoryRepository: InventoryRepository {
+final class InMemoryBookInventoryRepository: BookInventoryRepository {
 
     private var inventories: [UUID: BookInventory] = [:]
 

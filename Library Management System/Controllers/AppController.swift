@@ -72,8 +72,8 @@ final class AppController {
     private func login(as role: UserRole) {
         print("=== \(role == .librarian ? "Librarian" : "User") Login ===")
 
-        let email = InputUtils.readEmail("Enter email")
-        let password = InputUtils.readPassword("Enter Password")
+        let email = InputUtils.readString("Enter email")
+        let password = InputUtils.readString("Enter Password")
 
         do {
 

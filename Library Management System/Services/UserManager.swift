@@ -15,7 +15,7 @@ final class UserManager: UserService {
             return .userNotFound
         }
         let mergedUser = User(
-            userId: existingUser.id,
+            id: existingUser.id,
             name: updatedUser.name.isEmpty
                 ? existingUser.name
                 : updatedUser.name,

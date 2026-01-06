@@ -7,7 +7,7 @@ struct OutputUtils {
         title: String
     ) {
 
-        print("=== \(title) ===\n")
+        print("\n=== \(title) ===\n")
 
         for (index, option) in options.enumerated() {
             print("\(index + 1). \(option.rawValue)")
@@ -26,10 +26,25 @@ struct OutputUtils {
             Title: \(book.title)
             Author: \(book.author)
             Category: \(book.category.rawValue)
-            Available: \(book.availableCopies)/\(book.totalCopies)
             """
         )
-        print(String(repeating: "==", count: 10))
+    }
+
+    static func showSearchResults(
+        _ results: [(book: Book, inventory: BookInventory)]
+    ) {
+
+        for (index, result) in results.enumerated() {
+            print(
+                """
+                \(index + 1).Title      : \(result.book.title)
+                  Author     : \(result.book.author)
+                  Category   : \(result.book.category.rawValue)
+                  Available  : \(result.inventory.availableCopies)/\(result.inventory.totalCopies)
+                 \n
+                """
+            )
+        }
     }
 
     static func printUserDetails(_ user: User) {

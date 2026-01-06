@@ -10,12 +10,12 @@ final class UserManager: UserService {
 
     func updateProfile(_ updatedUser: User) -> UpdateProfileResult {
 
-        guard let existingUser = userRepository.findById(updatedUser.userId)
+        guard let existingUser = userRepository.findById(updatedUser.id)
         else {
             return .userNotFound
         }
         let mergedUser = User(
-            userId: existingUser.userId,
+            userId: existingUser.id,
             name: updatedUser.name.isEmpty
                 ? existingUser.name
                 : updatedUser.name,

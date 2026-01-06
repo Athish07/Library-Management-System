@@ -123,7 +123,7 @@ final class LibrarianController: ProfileManagable {
         }
 
         do {
-            try libraryService.removeBook(bookId: selectedBook.bookId)
+            try libraryService.removeBook(bookId: selectedBook.id)
             print("Book '\(selectedBook.title)' removed successfully.")
         } catch {
             OutputUtils.showError(error.localizedDescription)
@@ -225,7 +225,7 @@ final class LibrarianController: ProfileManagable {
 
         do {
             let history = try reportService.getIssuedBookHistory(
-                bookId: selectedBook.bookId
+                bookId: selectedBook.id
             )
 
             if history.isEmpty {

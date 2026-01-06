@@ -88,7 +88,7 @@ final class AppController {
 
             case .librarian:
                 LibrarianController(
-                    currentUserId: user.userId,
+                    currentUserId: user.id,
                     libraryService: libraryService,
                     userService: userService,
                     reportService: reportService
@@ -96,7 +96,7 @@ final class AppController {
 
             case .user:
                 UserController(
-                    currentUserId: user.userId,
+                    currentUserId: user.id,
                     libraryService: libraryService,
                     userService: userService,
                     reportService: reportService

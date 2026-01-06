@@ -2,7 +2,7 @@ import Foundation
 
 struct User: Equatable {
 
-    let userId: UUID
+    let id: UUID
     var name: String
     var email: String
     var password: String
@@ -17,7 +17,7 @@ struct User: Equatable {
     }
 
     init(
-        userId: UUID = UUID(),
+        id: UUID = UUID(),
         name: String,
         email: String,
         password: String,
@@ -25,7 +25,7 @@ struct User: Equatable {
         address: String,
         role: Role
     ) {
-        self.userId = userId
+        self.id = id
         self.name = name
         self.email = email
         self.password = password

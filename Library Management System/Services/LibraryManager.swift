@@ -5,6 +5,7 @@ final class LibraryManager: LibraryService {
     private let bookRepository: BookRepository
     private let borrowRequestRepository: BorrowRequestRepository
     private let issuedBookRepository: IssuedBookRepository
+    private let inventoryRepository: InventoryRepository
     private let finePerDay: Double = 1.0
     private let dueInDays: Int = 14
     private let extensionDays: Int = 7
@@ -12,11 +13,13 @@ final class LibraryManager: LibraryService {
     init(
         bookRepository: BookRepository,
         borrowRequestRepository: BorrowRequestRepository,
-        issuedBookRepository: IssuedBookRepository
+        issuedBookRepository: IssuedBookRepository,
+        inventoryRepository: InventoryRepository
     ) {
         self.bookRepository = bookRepository
         self.borrowRequestRepository = borrowRequestRepository
         self.issuedBookRepository = issuedBookRepository
+        self.inventoryRepository = inventoryRepository
     }
 
     func search(by query: String) -> [Book] {
@@ -35,73 +38,80 @@ final class LibraryManager: LibraryService {
             }
             .sorted { $0.title.lowercased() < $1.title.lowercased() }
     }
-
+    
     func getAvailableBooks() -> [Book] {
-        bookRepository.getAllBooks().filter { $0.availableCopies > 0 }
-    }
 
+        let books = bookRepository.getAllBooks()
+
+        return books.filter { book in
+            guard let inventory =
+                    inventoryRepository.findByBookId(book.id)
+            else {
+                return false
+            }
+            return inventory.availableCopies > 0
+        }
+    }
+    
     func requestBorrow(bookId: UUID, by userId: UUID) throws {
 
-        guard let book = bookRepository.findById(bookId) else {
+        guard bookRepository.findById(bookId) != nil else {
             throw LibraryError.bookNotFound
         }
 
-        guard book.availableCopies > 0 else {
+        guard let inventory = inventoryRepository.findByBookId(bookId),
+              inventory.availableCopies > 0
+        else {
             throw LibraryError.bookUnavailable
         }
 
-        let existing = borrowRequestRepository.getAllRequests().contains {
-            request in
-            request.bookId == bookId && request.userId == userId
-                && request.status == .pending
+        let duplicate = borrowRequestRepository.getAllRequests().contains {
+            $0.bookId == bookId && $0.userId == userId && $0.status == .pending
         }
 
-        guard !existing else {
+        guard !duplicate else {
             throw LibraryError.duplicateBorrowRequest
         }
 
-        let request = BorrowRequest(userId: userId, bookId: bookId)
-        borrowRequestRepository.save(request)
+        borrowRequestRepository.save(
+            BorrowRequest(userId: userId, bookId: bookId)
+        )
     }
-
+    
     func getBorrowedBooks(for userId: UUID) -> [IssuedBook] {
         issuedBookRepository.getAllIssuedBooks().filter { $0.userId == userId }
     }
+    
+    func returnBook(issueId: UUID, on returnDate: Date) throws -> Double {
 
-    func returnBook(issueId: UUID, on returnDate: Date) throws
-        -> Double
-    {
-        guard var issuedBook = issuedBookRepository.findById(issueId) else {
+        guard var issued =
+                issuedBookRepository.findById(issueId)
+        else {
             throw LibraryError.issueNotFound
         }
 
-        guard issuedBook.returnDate == nil else {
-            throw LibraryError.bookAlreadyReturned
-        }
-
-        guard issuedBook.markReturned(on: returnDate) else {
+        guard issued.markReturned(on: returnDate) else {
             throw LibraryError.invalidReturnDate
         }
 
-        var fine: Double = 0.0
-
-        if returnDate > issuedBook.dueDate {
-
-            fine = finePerDay * Double(issuedBook.daysOverdue)
+        var fine = 0.0
+        if returnDate > issued.dueDate {
+            fine = finePerDay * Double(issued.daysOverdue)
         }
 
-        issuedBook.applyFine(fine)
+        issued.applyFine(fine)
 
-        if var book = bookRepository.findById(issuedBook.bookId) {
-            book.returnCopy()
-            bookRepository.save(book)
-        }
+        guard var inventory =
+                inventoryRepository.findByBookId(issued.bookId)
+        else { return fine }
 
-        issuedBookRepository.save(issuedBook)
+        inventory.returnCopy()
+        inventoryRepository.save(inventory)
+
+        issuedBookRepository.save(issued)
         return fine
-
     }
-
+    
     func renewBook(_ issueId: UUID) throws -> IssuedBook {
 
         guard var issued = issuedBookRepository.findById(issueId) else {
@@ -138,25 +148,36 @@ final class LibraryManager: LibraryService {
             throw LibraryError.invalidCopyCount
         }
 
-        let allBooks = bookRepository.getAllBooks()
-
-        if var existingBook = allBooks.first(where: {
+        if let existing = bookRepository.getAllBooks().first(where: {
             $0.title.lowercased() == title.lowercased()
                 && $0.author.lowercased() == author.lowercased()
                 && $0.category == category
         }) {
-            existingBook.addCopies(copiesToAdd)
-            bookRepository.save(existingBook)
+
+            guard var inventory =
+                    inventoryRepository.findByBookId(existing.id)
+            else { return }
+
+            inventory.addCopies(copiesToAdd)
+            inventoryRepository.save(inventory)
+
         } else {
-            let newBook = Book(
+
+            let book = Book(
                 title: title,
                 author: author,
-                category: category,
+                category: category
+            )
+
+            bookRepository.save(book)
+
+            let inventory = BookInventory(
+                bookId: book.id,
                 totalCopies: copiesToAdd
             )
-            bookRepository.save(newBook)
-        }
 
+            inventoryRepository.save(inventory)
+        }
     }
 
     func removeBook(bookId: UUID) throws {
@@ -194,36 +215,30 @@ final class LibraryManager: LibraryService {
         }
         return book
     }
-
+    
     func approveBorrowRequest(requestId: UUID) throws {
 
-        guard var request = borrowRequestRepository.findById(requestId) else {
+        guard var request =
+                borrowRequestRepository.findById(requestId)
+        else {
             throw LibraryError.requestNotFound
         }
 
-        guard var book = bookRepository.findById(request.bookId),
-            book.availableCopies > 0
+        guard var inventory =
+                inventoryRepository.findByBookId(request.bookId),
+              inventory.issueCopy()
         else {
             throw LibraryError.bookUnavailable
         }
 
-        guard book.issueCopy() else {
-            throw LibraryError.bookUnavailable
-        }
-        bookRepository.save(book)
+        inventoryRepository.save(inventory)
+
         let issueDate = Date()
-
-        guard
-            let dueDate = Calendar.current.date(
-                byAdding: .day,
-                value: dueInDays,
-                to: issueDate
-            )
-        else {
-            fatalError(
-                "Failed to calculate due date."
-            )
-        }
+        let dueDate = Calendar.current.date(
+            byAdding: .day,
+            value: dueInDays,
+            to: issueDate
+        )!
 
         let issuedBook = IssuedBook(
             bookId: request.bookId,
@@ -234,13 +249,13 @@ final class LibraryManager: LibraryService {
 
         issuedBookRepository.save(issuedBook)
 
-        if request.approve() {
-            borrowRequestRepository.save(request)
-        } else {
+        guard request.approve() else {
             throw LibraryError.requestNotPending
         }
-    }
 
+        borrowRequestRepository.save(request)
+    }
+    
     func rejectBorrowRequest(requestId: UUID) throws {
         guard var request = borrowRequestRepository.findById(requestId) else {
             throw LibraryError.requestNotFound

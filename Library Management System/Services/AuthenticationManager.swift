@@ -45,7 +45,7 @@ final class AuthenticationManager: AuthenticationService {
             address: address,
             role: .user
         )
-
+        
         userRepository.save(user)
     }
 

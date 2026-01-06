@@ -1,10 +1,11 @@
 import Foundation
 
 final class InMemoryBookRepository: BookRepository {
+    
     private var books: [UUID: Book] = [:]
-
+    
     func save(_ book: Book) {
-        books[book.bookId] = book
+        books[book.id] = book
     }
 
     func remove(bookId: UUID) {
@@ -20,5 +21,5 @@ final class InMemoryBookRepository: BookRepository {
             $0.title.lowercased() < $1.title.lowercased()
         }
     }
-
+    
 }

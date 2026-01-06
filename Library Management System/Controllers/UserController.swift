@@ -253,7 +253,7 @@ extension UserController {
 
         do {
             try libraryService.requestBorrow(
-                bookId: selectedBook.bookId,
+                bookId: selectedBook.id,
                 by: userId
             )
             print(
@@ -267,7 +267,7 @@ extension UserController {
 
     enum UserMenuOption: String, CaseIterable {
         case searchToBorrowBooks = "Search to Borrow Books"
-        case viewAvailableBooksAndBorrow = "View All Available Books and make borrow"
+        case viewAvailableBooksAndBorrow = "View All Available Books and Borrow"
         case viewMyBorrowedBooks = "View My Borrowed Books"
         case renewBook = "Renew the Borrowed Book"
         case returnBook = "Return a Book"
@@ -276,5 +276,5 @@ extension UserController {
         case updateProfile = "Update Profile"
         case logout = "Logout"
     }
-
+    
 }

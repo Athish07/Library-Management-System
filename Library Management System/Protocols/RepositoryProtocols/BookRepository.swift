@@ -5,5 +5,4 @@ protocol BookRepository {
     func remove(bookId: UUID)
     func findById(_ bookId: UUID) -> Book?
     func getAllBooks() -> [Book]
-
 }

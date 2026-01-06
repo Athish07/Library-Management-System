@@ -5,7 +5,7 @@ final class InMemoryUserRepository: UserRepository {
     private var users: [UUID: User] = [:]
 
     func save(_ user: User) {
-        users[user.userId] = user
+        users[user.id] = user
     }
 
     func findById(_ userId: UUID) -> User? {

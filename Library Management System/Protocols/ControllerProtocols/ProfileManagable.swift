@@ -44,7 +44,7 @@ extension ProfileManagable {
         )
 
         let updatedUser = User(
-            userId: user.userId,
+            id: user.id,
             name: name,
             email: email,
             password: user.password,

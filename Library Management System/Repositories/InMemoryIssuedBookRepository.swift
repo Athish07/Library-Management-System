@@ -19,7 +19,7 @@ final class InMemoryIssuedBookRepository: IssuedBookRepository {
     }
 
     func getAllIssuedBooks() -> [IssuedBook] {
-        Array(issuedBooks.values)
+        issuedBooks.values
             .sorted { $0.issueDate > $1.issueDate }
     }
 

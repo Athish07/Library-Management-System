@@ -17,7 +17,7 @@ final class InMemoryBookRepository: BookRepository {
     }
 
     func getAllBooks() -> [Book] {
-        Array(books.values).sorted {
+        books.values.sorted {
             $0.title.lowercased() < $1.title.lowercased()
         }
     }

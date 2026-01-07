@@ -13,13 +13,13 @@ final class InMemoryBorrowRequestRepository: BorrowRequestRepository {
     }
 
     func getByUserId(_ userId: UUID) -> [BorrowRequest] {
-        Array(requests.values).filter {
-            $0.userId == userId
-        }
+        requests.values
+            .filter { $0.userId == userId }
+            .sorted { $0.requestDate < $1.requestDate }
     }
 
     func getAllRequests() -> [BorrowRequest] {
-        Array(requests.values)
+        requests.values
             .sorted { $0.requestDate < $1.requestDate }
     }
 

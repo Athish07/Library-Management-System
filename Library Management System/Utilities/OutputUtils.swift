@@ -2,7 +2,7 @@ import Foundation
 
 struct OutputUtils {
 
-    static func showMenu<T: CaseIterable & RawRepresentable>(
+    static func showMenu<T: RawRepresentable>(
         _ options: [T],
         title: String
     ) {

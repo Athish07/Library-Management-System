@@ -234,20 +234,25 @@ final class LibraryManager: LibraryService {
 
         guard var inventory =
                 bookInventoryRepository.findByBookId(request.bookId),
-              inventory.issueCopy()
+            inventory.issueCopy()
         else {
             throw LibraryError.bookUnavailable
         }
-
+        
         bookInventoryRepository.save(inventory)
 
         let issueDate = Date()
-        let dueDate = Calendar.current.date(
-            byAdding: .day,
-            value: dueInDays,
-            to: issueDate
-        )!
-
+        
+        guard
+            let dueDate = Calendar.current.date(
+                byAdding: .day,
+                value: dueInDays,
+                to: issueDate
+            )
+        else {
+            fatalError("Date calculation failed")
+        }
+        
         let issuedBook = IssuedBook(
             bookId: request.bookId,
             userId: request.userId,

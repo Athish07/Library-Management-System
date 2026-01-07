@@ -24,10 +24,7 @@ final class LibraryManager: LibraryService {
     
     func search(by query: String) -> [BookWithInventory] {
 
-        let normalized = query
-            .lowercased()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
+        let normalized = query.lowercased()
         let books = normalized.isEmpty
             ? bookRepository.getAllBooks()
             : bookRepository.getAllBooks().filter {
